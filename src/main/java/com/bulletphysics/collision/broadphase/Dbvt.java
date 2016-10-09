@@ -26,23 +26,24 @@
 package com.bulletphysics.collision.broadphase;
 
 import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.collision.broadphase.Dbvt.Node;
 import com.bulletphysics.linearmath.MiscUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.IntArrayList;
 import com.bulletphysics.util.ObjectArrayList;
 import cz.advel.stack.Stack;
 import java.util.Collections;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
  * @author jezek2
  */
 public class Dbvt {
-	
+
 	public static final int SIMPLE_STACKSIZE = 64;
 	public static final int DOUBLE_STACKSIZE = SIMPLE_STACKSIZE * 2;
-	
+
 	public Node root = null;
 	public Node free = null;
 	public int lkhd = -1;
@@ -89,7 +90,7 @@ public class Dbvt {
 		if (passes < 0) {
 			passes = leaves;
 		}
-		
+
 		if (root != null && (passes > 0)) {
 			Node[] root_ref = new Node[1];
 			do {
@@ -99,7 +100,7 @@ public class Dbvt {
 					root_ref[0] = root;
 					node = sort(node, root_ref).childs[(opath >>> bit) & 1];
 					root = root_ref[0];
-					
+
 					bit = (bit + 1) & (/*sizeof(unsigned)*/4 * 8 - 1);
 				}
 				update(node);
@@ -151,11 +152,11 @@ public class Dbvt {
 		insertleaf(this, root, leaf);
 	}
 
-	public boolean update(Node leaf, DbvtAabbMm volume, Vector3f velocity, float margin) {
+	public boolean update(Node leaf, DbvtAabbMm volume, Vector3d velocity, double margin) {
 		if (leaf.volume.Contain(volume)) {
 			return false;
 		}
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		tmp.set(margin, margin, margin);
 		volume.Expand(tmp);
 		volume.SignedExpand(velocity);
@@ -163,7 +164,7 @@ public class Dbvt {
 		return true;
 	}
 
-	public boolean update(Node leaf, DbvtAabbMm volume, Vector3f velocity) {
+	public boolean update(Node leaf, DbvtAabbMm volume, Vector3d velocity) {
 		if (leaf.volume.Contain(volume)) {
 			return false;
 		}
@@ -172,11 +173,11 @@ public class Dbvt {
 		return true;
 	}
 
-	public boolean update(Node leaf, DbvtAabbMm volume, float margin) {
+	public boolean update(Node leaf, DbvtAabbMm volume, double margin) {
 		if (leaf.volume.Contain(volume)) {
 			return false;
 		}
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		tmp.set(margin, margin, margin);
 		volume.Expand(tmp);
 		update(leaf, volume);
@@ -352,12 +353,12 @@ public class Dbvt {
 		}
 	}
 
-	public static void collideRAY(Node root, Vector3f origin, Vector3f direction, ICollide policy) {
+	public static void collideRAY(Node root, Vector3d origin, Vector3d direction, ICollide policy) {
 		//DBVT_CHECKTYPE
 		if (root != null) {
-			Vector3f normal = Stack.alloc(Vector3f.class);
+			Vector3d normal = Stack.alloc(Vector3d.class);
 			normal.normalize(direction);
-			Vector3f invdir = Stack.alloc(Vector3f.class);
+			Vector3d invdir = Stack.alloc(Vector3d.class);
 			invdir.set(1f / normal.x, 1f / normal.y, 1f / normal.z);
 			int[] signs = new int[] { direction.x<0 ? 1:0, direction.y<0 ? 1:0, direction.z<0 ? 1:0 };
 			ObjectArrayList<Node> stack = new ObjectArrayList<Node>(SIMPLE_STACKSIZE);
@@ -378,7 +379,7 @@ public class Dbvt {
 		}
 	}
 
-	public static void collideKDOP(Node root, Vector3f[] normals, float[] offsets, int count, ICollide policy) {
+	public static void collideKDOP(Node root, Vector3d[] normals, double[] offsets, int count, ICollide policy) {
 		//DBVT_CHECKTYPE
 		if (root != null) {
 			int inside = (1 << count) - 1;
@@ -423,11 +424,11 @@ public class Dbvt {
 		}
 	}
 
-	public static void collideOCL(Node root, Vector3f[] normals, float[] offsets, Vector3f sortaxis, int count, ICollide policy) {
+	public static void collideOCL(Node root, Vector3d[] normals, double[] offsets, Vector3d sortaxis, int count, ICollide policy) {
 		collideOCL(root, normals, offsets, sortaxis, count, policy, true);
 	}
 
-	public static void collideOCL(Node root, Vector3f[] normals, float[] offsets, Vector3f sortaxis, int count, ICollide policy, boolean fullsort) {
+	public static void collideOCL(Node root, Vector3d[] normals, double[] offsets, Vector3d sortaxis, int count, ICollide policy, boolean fullsort) {
 		//DBVT_CHECKTYPE
 		if (root != null) {
 			int srtsgns = (sortaxis.x >= 0 ? 1 : 0) +
@@ -538,8 +539,8 @@ public class Dbvt {
 			while (stack.size() > 0);
 		}
 	}
-	
-	public static int nearest(IntArrayList i, ObjectArrayList<sStkNPS> a, float v, int l, int h) {
+
+	public static int nearest(IntArrayList i, ObjectArrayList<sStkNPS> a, double v, int l, int h) {
 		int m = 0;
 		while (l < h) {
 			m = (l + h) >> 1;
@@ -552,7 +553,7 @@ public class Dbvt {
 		}
 		return h;
 	}
-	
+
 	public static int allocate(IntArrayList ifree, ObjectArrayList<sStkNPS> stock, sStkNPS value) {
 		int i;
 		if (ifree.size() > 0) {
@@ -566,9 +567,9 @@ public class Dbvt {
 		}
 		return (i);
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	private static int indexof(Node node) {
 		return (node.parent.childs[1] == node)? 1:0;
 	}
@@ -577,10 +578,10 @@ public class Dbvt {
 		DbvtAabbMm.Merge(a, b, out);
 		return out;
 	}
-	
+
 	// volume+edge lengths
-	private static float size(DbvtAabbMm a) {
-		Vector3f edges = a.Lengths(Stack.alloc(Vector3f.class));
+	private static double size(DbvtAabbMm a) {
+		Vector3d edges = a.Lengths(Stack.alloc(Vector3d.class));
 		return (edges.x * edges.y * edges.z +
 		        edges.x + edges.y + edges.z);
 	}
@@ -600,7 +601,7 @@ public class Dbvt {
 		}
 		deletenode(pdbvt, node);
 	}
-	
+
 	private static Node createnode(Dbvt pdbvt, Node parent, DbvtAabbMm volume, Object data) {
 		Node node;
 		if (pdbvt.free != null) {
@@ -663,7 +664,7 @@ public class Dbvt {
 			}
 		}
 	}
-	
+
 	private static Node removeleaf(Dbvt pdbvt, Node leaf) {
 		if (leaf == pdbvt.root) {
 			pdbvt.root = null;
@@ -697,7 +698,7 @@ public class Dbvt {
 			}
 		}
 	}
-	
+
 	private static void fetchleaves(Dbvt pdbvt, Node root, ObjectArrayList<Node> leaves) {
 		fetchleaves(pdbvt, root, leaves, -1);
 	}
@@ -712,9 +713,9 @@ public class Dbvt {
 			leaves.add(root);
 		}
 	}
-	
-	private static void split(ObjectArrayList<Node> leaves, ObjectArrayList<Node> left, ObjectArrayList<Node> right, Vector3f org, Vector3f axis) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+
+	private static void split(ObjectArrayList<Node> leaves, ObjectArrayList<Node> left, ObjectArrayList<Node> right, Vector3d org, Vector3d axis) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		MiscUtil.resize(left, 0, Node.class);
 		MiscUtil.resize(right, 0, Node.class);
 		for (int i=0, ni=leaves.size(); i<ni; i++) {
@@ -728,7 +729,7 @@ public class Dbvt {
 			}
 		}
 	}
-	
+
 	private static DbvtAabbMm bounds(ObjectArrayList<Node> leaves) {
 		DbvtAabbMm volume = new DbvtAabbMm(leaves.getQuick(0).volume);
 		for (int i=1, ni=leaves.size(); i<ni; i++) {
@@ -736,15 +737,15 @@ public class Dbvt {
 		}
 		return volume;
 	}
-	
+
 	private static void bottomup(Dbvt pdbvt, ObjectArrayList<Node> leaves) {
 		DbvtAabbMm tmpVolume = new DbvtAabbMm();
 		while (leaves.size() > 1) {
-			float minsize = BulletGlobals.SIMD_INFINITY;
+			double minsize = BulletGlobals.SIMD_INFINITY;
 			int[] minidx = new int[] { -1, -1 };
 			for (int i=0; i<leaves.size(); i++) {
 				for (int j=i+1; j<leaves.size(); j++) {
-					float sz = size(merge(leaves.getQuick(i).volume, leaves.getQuick(j).volume, tmpVolume));
+					double sz = size(merge(leaves.getQuick(i).volume, leaves.getQuick(j).volume, tmpVolume));
 					if (sz < minsize) {
 						minsize = sz;
 						minidx[0] = i;
@@ -765,13 +766,13 @@ public class Dbvt {
 		}
 	}
 
-	private static Vector3f[] axis = new Vector3f[] { new Vector3f(1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, 0, 1) };
-	
+	private static Vector3d[] axis = new Vector3d[] { new Vector3d(1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, 0, 1) };
+
 	private static Node topdown(Dbvt pdbvt, ObjectArrayList<Node> leaves, int bu_treshold) {
 		if (leaves.size() > 1) {
 			if (leaves.size() > bu_treshold) {
 				DbvtAabbMm vol = bounds(leaves);
-				Vector3f org = vol.Center(Stack.alloc(Vector3f.class));
+				Vector3d org = vol.Center(Stack.alloc(Vector3d.class));
 				ObjectArrayList[] sets = new ObjectArrayList[2];
 				for (int i=0; i<sets.length; i++) {
 					sets[i] = new ObjectArrayList();
@@ -780,7 +781,7 @@ public class Dbvt {
 				int bestmidp = leaves.size();
 				int[][] splitcount = new int[/*3*/][/*2*/]{{0, 0}, {0, 0}, {0, 0}};
 
-				Vector3f x = Stack.alloc(Vector3f.class);
+				Vector3d x = Stack.alloc(Vector3d.class);
 
 				for (int i=0; i<leaves.size(); i++) {
 					leaves.getQuick(i).volume.Center(x);
@@ -824,7 +825,7 @@ public class Dbvt {
 		}
 		return leaves.getQuick(0);
 	}
-	
+
 	private static Node sort(Node n, Node[] r) {
 		Node p = n.parent;
 		assert (n.isinternal());
@@ -856,16 +857,16 @@ public class Dbvt {
 		}
 		return n;
 	}
-	
+
 	private static Node walkup(Node n, int count) {
 		while (n != null && (count--) != 0) {
 			n = n.parent;
 		}
 		return n;
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	public static class Node {
 		public final DbvtAabbMm volume = new DbvtAabbMm();
 		public Node parent;
@@ -880,7 +881,7 @@ public class Dbvt {
 			return !isleaf();
 		}
 	}
-	
+
 	/** Stack element */
 	public static class sStkNN {
 		public Node a;
@@ -905,24 +906,24 @@ public class Dbvt {
 	public static class sStkNPS {
 		public Node node;
 		public int mask;
-		public float value;
+		public double value;
 
 		public sStkNPS() {
 		}
 
-		public sStkNPS(Node n, int m, float v) {
+		public sStkNPS(Node n, int m, double v) {
 			node = n;
 			mask = m;
 			value = v;
 		}
-		
+
 		public void set(sStkNPS o) {
 			node = o.node;
 			mask = o.mask;
 			value = o.value;
 		}
 	}
-	
+
 	public static class sStkCLN {
 		public Node node;
 		public Node parent;
@@ -940,7 +941,7 @@ public class Dbvt {
 		public void Process(Node n) {
 		}
 
-		public void Process(Node n, float f) {
+		public void Process(Node n, double f) {
 			Process(n);
 		}
 
@@ -958,10 +959,10 @@ public class Dbvt {
 		public abstract void WriteNode(Node n, int index, int parent, int child0, int child1);
 		public abstract void WriteLeaf(Node n, int index, int parent);
 	}
-	
+
 	public static class IClone {
 		public void CloneLeaf(Node n) {
 		}
 	}
-	
+
 }

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -29,7 +29,7 @@ import com.bulletphysics.collision.broadphase.DispatcherInfo;
 
 /**
  * Default implementation of {@link NearCallback}.
- * 
+ *
  * @author jezek2
  */
 public class DefaultNearCallback extends NearCallback {
@@ -56,7 +56,7 @@ public class DefaultNearCallback extends NearCallback {
 				}
 				else {
 					// continuous collision detection query, time of impact (toi)
-					float toi = collisionPair.algorithm.calculateTimeOfImpact(colObj0, colObj1, dispatchInfo, contactPointResult);
+					double toi = collisionPair.algorithm.calculateTimeOfImpact(colObj0, colObj1, dispatchInfo, contactPointResult);
 					if (dispatchInfo.timeOfImpact > toi) {
 						dispatchInfo.timeOfImpact = toi;
 					}
@@ -64,5 +64,5 @@ public class DefaultNearCallback extends NearCallback {
 			}
 		}
 	}
-	
+
 }

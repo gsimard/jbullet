@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -33,7 +33,7 @@ package com.bulletphysics.linearmath;
 
 /**
  * Iterator to navigate through profile tree.
- * 
+ *
  * @author jezek2
  */
 public class CProfileIterator {
@@ -45,21 +45,21 @@ public class CProfileIterator {
 		currentParent = start;
 		currentChild = currentParent.getChild();
 	}
-	
+
 	// Access all the children of the current parent
-	
+
 	public void first() {
 		currentChild = currentParent.getChild();
 	}
-	
+
 	public void next() {
 		currentChild = currentChild.getSibling();
 	}
-	
+
 	public boolean isDone() {
 		return (currentChild == null);
 	}
-	
+
 	public boolean isRoot() {
 		return (currentParent.getParent() == null);
 	}
@@ -79,9 +79,9 @@ public class CProfileIterator {
 			currentChild = currentParent.getChild();
 		}
 	}
-	
+
 	//public void enterLargestChild(); // Make the largest child the new parent
-	
+
 	/**
 	 * Make the current parent's parent the new parent.
 	 */
@@ -93,7 +93,7 @@ public class CProfileIterator {
 	}
 
 	// Access the current child
-	
+
 	public String getCurrentName() {
 		return currentChild.getName();
 	}
@@ -102,12 +102,12 @@ public class CProfileIterator {
 		return currentChild.getTotalCalls();
 	}
 
-	public float getCurrentTotalTime() {
+	public double getCurrentTotalTime() {
 		return currentChild.getTotalTime();
 	}
 
 	// Access the current parent
-	
+
 	public String getCurrentParentName() {
 		return currentParent.getName();
 	}
@@ -116,8 +116,8 @@ public class CProfileIterator {
 		return currentParent.getTotalCalls();
 	}
 
-	public float getCurrentParentTotalTime() {
+	public double getCurrentParentTotalTime() {
 		return currentParent.getTotalTime();
 	}
-	
+
 }

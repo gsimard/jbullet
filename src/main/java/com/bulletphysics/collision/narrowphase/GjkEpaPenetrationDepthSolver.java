@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -26,12 +26,12 @@ package com.bulletphysics.collision.narrowphase;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.IDebugDraw;
 import com.bulletphysics.linearmath.Transform;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * GjkEpaPenetrationDepthSolver uses the Expanding Polytope Algorithm to calculate
  * the penetration depth between two convex shapes.
- * 
+ *
  * @author jezek2
  */
 public class GjkEpaPenetrationDepthSolver extends ConvexPenetrationDepthSolver {
@@ -41,13 +41,13 @@ public class GjkEpaPenetrationDepthSolver extends ConvexPenetrationDepthSolver {
 	public boolean calcPenDepth(SimplexSolverInterface simplexSolver,
 												  ConvexShape pConvexA, ConvexShape pConvexB,
 												  Transform transformA, Transform transformB,
-												  Vector3f v, Vector3f wWitnessOnA, Vector3f wWitnessOnB,
+												  Vector3d v, Vector3d wWitnessOnA, Vector3d wWitnessOnB,
 												  IDebugDraw debugDraw/*, btStackAlloc* stackAlloc*/)
 	{
-		float radialmargin = 0f;
+		double radialmargin = 0f;
 
 		// JAVA NOTE: 2.70b1: update when GjkEpaSolver2 is ported
-		
+
 		GjkEpaSolver.Results results = new GjkEpaSolver.Results();
 		if (gjkEpaSolver.collide(pConvexA, transformA,
 				pConvexB, transformB,

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -24,20 +24,20 @@
 package com.bulletphysics.dynamics.constraintsolver;
 
 import com.bulletphysics.dynamics.RigidBody;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * TypedConstraint is the base class for Bullet constraints and vehicles.
- * 
+ *
  * @author jezek2
  */
 public abstract class TypedConstraint {
-	
+
 	//protected final BulletStack stack = BulletStack.get();
-	
+
 	// TODO: stack allocation
 	private static /*final*/ RigidBody s_fixed;// = new RigidBody(0, null, null);
-	
+
 	private static synchronized RigidBody getFixed() {
 		if (s_fixed == null) {
 			s_fixed = new RigidBody(0, null, null);
@@ -49,30 +49,30 @@ public abstract class TypedConstraint {
 	private int userConstraintId = -1;
 
 	private TypedConstraintType constraintType;
-	
+
 	protected RigidBody rbA;
 	protected RigidBody rbB;
-	protected float appliedImpulse = 0f;
+	protected double appliedImpulse = 0f;
 
 	public TypedConstraint(TypedConstraintType type) {
 		this(type, getFixed(), getFixed());
 	}
-	
+
 	public TypedConstraint(TypedConstraintType type, RigidBody rbA) {
 		this(type, rbA, getFixed());
 	}
-	
+
 	public TypedConstraint(TypedConstraintType type, RigidBody rbA, RigidBody rbB) {
 		this.constraintType = type;
 		this.rbA = rbA;
 		this.rbB = rbB;
-		getFixed().setMassProps(0f, new Vector3f(0f, 0f, 0f));
+		getFixed().setMassProps(0f, new Vector3d(0f, 0f, 0f));
 	}
-	
+
 	public abstract void buildJacobian();
 
-	public abstract void solveConstraint(float timeStep);
-	
+	public abstract void solveConstraint(double timeStep);
+
 	public RigidBody getRigidBodyA() {
 		return rbA;
 	}
@@ -84,7 +84,7 @@ public abstract class TypedConstraint {
 	public int getUserConstraintType() {
 		return userConstraintType;
 	}
-	
+
 	public void setUserConstraintType(int userConstraintType) {
 		this.userConstraintType = userConstraintType;
 	}
@@ -101,12 +101,12 @@ public abstract class TypedConstraint {
 		this.userConstraintId = userConstraintId;
 	}
 
-	public float getAppliedImpulse() {
+	public double getAppliedImpulse() {
 		return appliedImpulse;
 	}
 
 	public TypedConstraintType getConstraintType() {
 		return constraintType;
 	}
-	
+
 }

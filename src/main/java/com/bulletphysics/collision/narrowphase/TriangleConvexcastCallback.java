@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -28,7 +28,7 @@ import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.collision.shapes.TriangleCallback;
 import com.bulletphysics.collision.shapes.TriangleShape;
 import com.bulletphysics.linearmath.Transform;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -40,10 +40,10 @@ public abstract class TriangleConvexcastCallback extends TriangleCallback {
 	public final Transform convexShapeFrom = new Transform();
 	public final Transform convexShapeTo = new Transform();
 	public final Transform triangleToWorld = new Transform();
-	public float hitFraction;
-	public float triangleCollisionMargin;
+	public double hitFraction;
+	public double triangleCollisionMargin;
 
-	public TriangleConvexcastCallback(ConvexShape convexShape, Transform convexShapeFrom, Transform convexShapeTo, Transform triangleToWorld, float triangleCollisionMargin) {
+	public TriangleConvexcastCallback(ConvexShape convexShape, Transform convexShapeFrom, Transform convexShapeTo, Transform triangleToWorld, double triangleCollisionMargin) {
 		this.convexShape = convexShape;
 		this.convexShapeFrom.set(convexShapeFrom);
 		this.convexShapeTo.set(convexShapeTo);
@@ -51,8 +51,8 @@ public abstract class TriangleConvexcastCallback extends TriangleCallback {
 		this.hitFraction = 1f;
 		this.triangleCollisionMargin = triangleCollisionMargin;
 	}
-	
-	public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+
+	public void processTriangle(Vector3d[] triangle, int partId, int triangleIndex) {
 		TriangleShape triangleShape = new TriangleShape(triangle[0], triangle[1], triangle[2]);
 		triangleShape.setMargin(triangleCollisionMargin);
 
@@ -95,6 +95,6 @@ public abstract class TriangleConvexcastCallback extends TriangleCallback {
 		}
 	}
 
-	public abstract float reportHit(Vector3f hitNormalLocal, Vector3f hitPointLocal, float hitFraction, int partId, int triangleIndex);
-	
+	public abstract double reportHit(Vector3d hitNormalLocal, Vector3d hitPointLocal, double hitFraction, int partId, int triangleIndex);
+
 }

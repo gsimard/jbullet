@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -39,25 +39,25 @@ import com.bulletphysics.linearmath.VectorUtil;
 import com.bulletphysics.util.ObjectArrayList;
 import com.bulletphysics.util.ObjectPool;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * ConvexConcaveCollisionAlgorithm supports collision between convex shapes
  * and (concave) trianges meshes.
- * 
+ *
  * @author jezek2
  */
 public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 
 	private boolean isSwapped;
 	private ConvexTriangleCallback btConvexTriangleCallback;
-	
+
 	public void init(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1, boolean isSwapped) {
 		super.init(ci);
 		this.isSwapped = isSwapped;
 		this.btConvexTriangleCallback = new ConvexTriangleCallback(dispatcher, body0, body1, isSwapped);
 	}
-	
+
 	@Override
 	public void destroy() {
 		btConvexTriangleCallback.destroy();
@@ -73,7 +73,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			ConcaveShape concaveShape = (ConcaveShape)triOb.getCollisionShape();
 
 			if (convexBody.getCollisionShape().isConvex()) {
-				float collisionMarginTriangle = concaveShape.getMargin();
+				double collisionMarginTriangle = concaveShape.getMargin();
 
 				resultOut.setPersistentManifold(btConvexTriangleCallback.manifoldPtr);
 				btConvexTriangleCallback.setTimeStepAndCounters(collisionMarginTriangle, dispatchInfo, resultOut);
@@ -85,8 +85,8 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 
 				concaveShape.processAllTriangles(
 						btConvexTriangleCallback,
-						btConvexTriangleCallback.getAabbMin(Stack.alloc(Vector3f.class)),
-						btConvexTriangleCallback.getAabbMax(Stack.alloc(Vector3f.class)));
+						btConvexTriangleCallback.getAabbMin(Stack.alloc(Vector3d.class)),
+						btConvexTriangleCallback.getAabbMax(Stack.alloc(Vector3d.class)));
 
 				resultOut.refreshContactPoints();
 			}
@@ -94,8 +94,8 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+	public double calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 
 		CollisionObject convexbody = isSwapped ? body1 : body0;
 		CollisionObject triBody = isSwapped ? body0 : body1;
@@ -105,13 +105,13 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 		// only perform CCD above a certain threshold, this prevents blocking on the long run
 		// because object in a blocked ccd state (hitfraction<1) get their linear velocity halved each frame...
 		tmp.sub(convexbody.getInterpolationWorldTransform(Stack.alloc(Transform.class)).origin, convexbody.getWorldTransform(Stack.alloc(Transform.class)).origin);
-		float squareMot0 = tmp.lengthSquared();
+		double squareMot0 = tmp.lengthSquared();
 		if (squareMot0 < convexbody.getCcdSquareMotionThreshold()) {
 			return 1f;
 		}
 
 		Transform tmpTrans = Stack.alloc(Transform.class);
-		
+
 		//const btVector3& from = convexbody->m_worldTransform.getOrigin();
 		//btVector3 to = convexbody->m_interpolationWorldTransform.getOrigin();
 		//todo: only do if the motion exceeds the 'radius'
@@ -126,19 +126,19 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 		convexToLocal.mul(triInv, convexbody.getInterpolationWorldTransform(tmpTrans));
 
 		if (triBody.getCollisionShape().isConcave()) {
-			Vector3f rayAabbMin = Stack.alloc(convexFromLocal.origin);
+			Vector3d rayAabbMin = Stack.alloc(convexFromLocal.origin);
 			VectorUtil.setMin(rayAabbMin, convexToLocal.origin);
 
-			Vector3f rayAabbMax = Stack.alloc(convexFromLocal.origin);
+			Vector3d rayAabbMax = Stack.alloc(convexFromLocal.origin);
 			VectorUtil.setMax(rayAabbMax, convexToLocal.origin);
 
-			float ccdRadius0 = convexbody.getCcdSweptSphereRadius();
+			double ccdRadius0 = convexbody.getCcdSweptSphereRadius();
 
 			tmp.set(ccdRadius0, ccdRadius0, ccdRadius0);
 			rayAabbMin.sub(tmp);
 			rayAabbMax.add(tmp);
 
-			float curHitFraction = 1f; // is this available?
+			double curHitFraction = 1f; // is this available?
 			LocalTriangleSphereCastCallback raycastCallback = new LocalTriangleSphereCastCallback(convexFromLocal, convexToLocal, convexbody.getCcdSweptSphereRadius(), curHitFraction);
 
 			raycastCallback.hitFraction = convexbody.getHitFraction();
@@ -166,24 +166,24 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			manifoldArray.add(btConvexTriangleCallback.manifoldPtr);
 		}
 	}
-	
+
 	public void clearCache() {
 		btConvexTriangleCallback.clearCache();
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	private static class LocalTriangleSphereCastCallback extends TriangleCallback {
 		public final Transform ccdSphereFromTrans = new Transform();
 		public final Transform ccdSphereToTrans = new Transform();
 		public final Transform meshTransform = new Transform();
 
-		public float ccdSphereRadius;
-		public float hitFraction;
-		
+		public double ccdSphereRadius;
+		public double hitFraction;
+
 		private final Transform ident = new Transform();
-		
-		public LocalTriangleSphereCastCallback(Transform from, Transform to, float ccdSphereRadius, float hitFraction) {
+
+		public LocalTriangleSphereCastCallback(Transform from, Transform to, double ccdSphereRadius, double hitFraction) {
 			this.ccdSphereFromTrans.set(from);
 			this.ccdSphereToTrans.set(to);
 			this.ccdSphereRadius = ccdSphereRadius;
@@ -192,13 +192,13 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			// JAVA NOTE: moved here from processTriangle
 			ident.setIdentity();
 		}
-		
-		public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+
+		public void processTriangle(Vector3d[] triangle, int partId, int triangleIndex) {
 			// do a swept sphere for now
-			
+
 			//btTransform ident;
 			//ident.setIdentity();
-			
+
 			CastResult castResult = new CastResult();
 			castResult.fraction = hitFraction;
 			SphereShape pointShape = new SphereShape(ccdSphereRadius);
@@ -234,10 +234,10 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			pool.release((ConvexConcaveCollisionAlgorithm)algo);
 		}
 	}
-	
+
 	public static class SwappedCreateFunc extends CollisionAlgorithmCreateFunc {
 		private final ObjectPool<ConvexConcaveCollisionAlgorithm> pool = ObjectPool.get(ConvexConcaveCollisionAlgorithm.class);
-		
+
 		@Override
 		public CollisionAlgorithm createCollisionAlgorithm(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1) {
 			ConvexConcaveCollisionAlgorithm algo = pool.get();
@@ -250,5 +250,5 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			pool.release((ConvexConcaveCollisionAlgorithm)algo);
 		}
 	}
-	
+
 }

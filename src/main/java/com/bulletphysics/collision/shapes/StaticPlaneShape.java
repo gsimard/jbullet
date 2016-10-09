@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -28,65 +28,65 @@ import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.TransformUtil;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * StaticPlaneShape simulates an infinite non-moving (static) collision plane.
- * 
+ *
  * @author jezek2
  */
 public class StaticPlaneShape extends ConcaveShape {
 
-	protected final Vector3f localAabbMin = new Vector3f();
-	protected final Vector3f localAabbMax = new Vector3f();
-	
-	protected final Vector3f planeNormal = new Vector3f();
-	protected float planeConstant;
-	protected final Vector3f localScaling = new Vector3f(0f, 0f, 0f);
+	protected final Vector3d localAabbMin = new Vector3d();
+	protected final Vector3d localAabbMax = new Vector3d();
 
-	public StaticPlaneShape(Vector3f planeNormal, float planeConstant) {
+	protected final Vector3d planeNormal = new Vector3d();
+	protected double planeConstant;
+	protected final Vector3d localScaling = new Vector3d(0f, 0f, 0f);
+
+	public StaticPlaneShape(Vector3d planeNormal, double planeConstant) {
 		this.planeNormal.normalize(planeNormal);
 		this.planeConstant = planeConstant;
 	}
 
-	public Vector3f getPlaneNormal(Vector3f out) {
+	public Vector3d getPlaneNormal(Vector3d out) {
 		out.set(planeNormal);
 		return out;
 	}
 
-	public float getPlaneConstant() {
+	public double getPlaneConstant() {
 		return planeConstant;
 	}
-	
-	@Override
-	public void processAllTriangles(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
 
-		Vector3f halfExtents = Stack.alloc(Vector3f.class);
+	@Override
+	public void processAllTriangles(TriangleCallback callback, Vector3d aabbMin, Vector3d aabbMax) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
+
+		Vector3d halfExtents = Stack.alloc(Vector3d.class);
 		halfExtents.sub(aabbMax, aabbMin);
 		halfExtents.scale(0.5f);
 
-		float radius = halfExtents.length();
-		Vector3f center = Stack.alloc(Vector3f.class);
+		double radius = halfExtents.length();
+		Vector3d center = Stack.alloc(Vector3d.class);
 		center.add(aabbMax, aabbMin);
 		center.scale(0.5f);
 
 		// this is where the triangles are generated, given AABB and plane equation (normal/constant)
 
-		Vector3f tangentDir0 = Stack.alloc(Vector3f.class), tangentDir1 = Stack.alloc(Vector3f.class);
+		Vector3d tangentDir0 = Stack.alloc(Vector3d.class), tangentDir1 = Stack.alloc(Vector3d.class);
 
 		// tangentDir0/tangentDir1 can be precalculated
 		TransformUtil.planeSpace1(planeNormal, tangentDir0, tangentDir1);
 
-		Vector3f supVertex0 = Stack.alloc(Vector3f.class), supVertex1 = Stack.alloc(Vector3f.class);
+		Vector3d supVertex0 = Stack.alloc(Vector3d.class), supVertex1 = Stack.alloc(Vector3d.class);
 
-		Vector3f projectedCenter = Stack.alloc(Vector3f.class);
+		Vector3d projectedCenter = Stack.alloc(Vector3d.class);
 		tmp.scale(planeNormal.dot(center) - planeConstant, planeNormal);
 		projectedCenter.sub(center, tmp);
 
-		Vector3f[] triangle = new Vector3f[] { Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class) };
+		Vector3d[] triangle = new Vector3d[] { Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class) };
 
 		tmp1.scale(radius, tangentDir0);
 		tmp2.scale(radius, tangentDir1);
@@ -122,7 +122,7 @@ public class StaticPlaneShape extends ConcaveShape {
 	}
 
 	@Override
-	public void getAabb(Transform t, Vector3f aabbMin, Vector3f aabbMax) {
+	public void getAabb(Transform t, Vector3d aabbMin, Vector3d aabbMax) {
 		aabbMin.set(-1e30f, -1e30f, -1e30f);
 		aabbMax.set(1e30f, 1e30f, 1e30f);
 	}
@@ -133,18 +133,18 @@ public class StaticPlaneShape extends ConcaveShape {
 	}
 
 	@Override
-	public void setLocalScaling(Vector3f scaling) {
+	public void setLocalScaling(Vector3d scaling) {
 		localScaling.set(scaling);
 	}
 
 	@Override
-	public Vector3f getLocalScaling(Vector3f out) {
+	public Vector3d getLocalScaling(Vector3d out) {
 		out.set(localScaling);
 		return out;
 	}
 
 	@Override
-	public void calculateLocalInertia(float mass, Vector3f inertia) {
+	public void calculateLocalInertia(double mass, Vector3d inertia) {
 		//moving concave objects not supported
 		inertia.set(0f, 0f, 0f);
 	}

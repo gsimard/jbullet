@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -25,24 +25,24 @@ package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * StridingMeshInterface is the abstract class for high performance access to
  * triangle meshes. It allows for sharing graphics and collision meshes. Also
  * it provides locking/unlocking of graphics meshes that are in GPU memory.
- * 
+ *
  * @author jezek2
  */
 public abstract class StridingMeshInterface {
 
-	protected final Vector3f scaling = new Vector3f(1f, 1f, 1f);
-	
-	public void internalProcessAllTriangles(InternalTriangleIndexCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
-		int graphicssubparts = getNumSubParts();
-		Vector3f[] triangle/*[3]*/ = new Vector3f[]{ Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class) };
+	protected final Vector3d scaling = new Vector3d(1f, 1f, 1f);
 
-		Vector3f meshScaling = getScaling(Stack.alloc(Vector3f.class));
+	public void internalProcessAllTriangles(InternalTriangleIndexCallback callback, Vector3d aabbMin, Vector3d aabbMax) {
+		int graphicssubparts = getNumSubParts();
+		Vector3d[] triangle/*[3]*/ = new Vector3d[]{ Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class) };
+
+		Vector3d meshScaling = getScaling(Stack.alloc(Vector3d.class));
 
 		for (int part=0; part<graphicssubparts; part++) {
 			VertexData data = getLockedReadOnlyVertexIndexBase(part);
@@ -57,10 +57,10 @@ public abstract class StridingMeshInterface {
 	}
 
 	private static class AabbCalculationCallback extends InternalTriangleIndexCallback {
-		public final Vector3f aabbMin = new Vector3f(1e30f, 1e30f, 1e30f);
-		public final Vector3f aabbMax = new Vector3f(-1e30f, -1e30f, -1e30f);
+		public final Vector3d aabbMin = new Vector3d(1e30f, 1e30f, 1e30f);
+		public final Vector3d aabbMax = new Vector3d(-1e30f, -1e30f, -1e30f);
 
-		public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
+		public void internalProcessTriangleIndex(Vector3d[] triangle, int partId, int triangleIndex) {
 			VectorUtil.setMin(aabbMin, triangle[0]);
 			VectorUtil.setMax(aabbMax, triangle[0]);
 			VectorUtil.setMin(aabbMin, triangle[1]);
@@ -69,8 +69,8 @@ public abstract class StridingMeshInterface {
 			VectorUtil.setMax(aabbMax, triangle[2]);
 		}
 	}
-	
-	public void calculateAabbBruteForce(Vector3f aabbMin, Vector3f aabbMax) {
+
+	public void calculateAabbBruteForce(Vector3d aabbMin, Vector3d aabbMax) {
 		// first calculate the total aabb for all triangles
 		AabbCalculationCallback aabbCallback = new AabbCalculationCallback();
 		aabbMin.set(-1e30f, -1e30f, -1e30f);
@@ -80,7 +80,7 @@ public abstract class StridingMeshInterface {
 		aabbMin.set(aabbCallback.aabbMin);
 		aabbMax.set(aabbCallback.aabbMax);
 	}
-	
+
 	/**
 	 * Get read and write access to a subpart of a triangle mesh.
 	 * This subpart has a continuous array of vertices and indices.
@@ -109,13 +109,13 @@ public abstract class StridingMeshInterface {
 	public abstract void preallocateVertices(int numverts);
 	public abstract void preallocateIndices(int numindices);
 
-	public Vector3f getScaling(Vector3f out) {
+	public Vector3d getScaling(Vector3d out) {
 		out.set(scaling);
 		return out;
 	}
-	
-	public void setScaling(Vector3f scaling) {
+
+	public void setScaling(Vector3d scaling) {
 		this.scaling.set(scaling);
 	}
-	
+
 }

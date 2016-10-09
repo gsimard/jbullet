@@ -37,7 +37,7 @@ import com.bulletphysics.linearmath.IDebugDraw;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * KinematicCharacterController is an object that supports a sliding motion in
@@ -47,72 +47,72 @@ import javax.vecmath.Vector3f;
  *
  * Interaction between KinematicCharacterController and dynamic rigid bodies
  * needs to be explicity implemented by the user.
- * 
+ *
  * @author tomrbryn
  */
 public class KinematicCharacterController extends ActionInterface {
 
-	private static Vector3f[] upAxisDirection = new Vector3f[] {
-		new Vector3f(1.0f, 0.0f, 0.0f),
-		new Vector3f(0.0f, 1.0f, 0.0f),
-		new Vector3f(0.0f, 0.0f, 1.0f),
+	private static Vector3d[] upAxisDirection = new Vector3d[] {
+		new Vector3d(1.0f, 0.0f, 0.0f),
+		new Vector3d(0.0f, 1.0f, 0.0f),
+		new Vector3d(0.0f, 0.0f, 1.0f),
 	};
 
-	protected float halfHeight;
-	
+	protected double halfHeight;
+
 	protected PairCachingGhostObject ghostObject;
 
 	// is also in ghostObject, but it needs to be convex, so we store it here
 	// to avoid upcast
 	protected ConvexShape convexShape;
 
-	protected float verticalVelocity;
-	protected float verticalOffset;
-	
-	protected float fallSpeed;
-	protected float jumpSpeed;
-	protected float maxJumpHeight;
-	
-	protected float maxSlopeRadians; // Slope angle that is set (used for returning the exact value) 
-	protected float maxSlopeCosine; // Cosine equivalent of m_maxSlopeRadians (calculated once when set, for optimization)
+	protected double verticalVelocity;
+	protected double verticalOffset;
 
-	protected float gravity;
-	
-	protected float turnAngle;
+	protected double fallSpeed;
+	protected double jumpSpeed;
+	protected double maxJumpHeight;
 
-	protected float stepHeight;
+	protected double maxSlopeRadians; // Slope angle that is set (used for returning the exact value)
+	protected double maxSlopeCosine; // Cosine equivalent of m_maxSlopeRadians (calculated once when set, for optimization)
 
-	protected float addedMargin; // @todo: remove this and fix the code
+	protected double gravity;
+
+	protected double turnAngle;
+
+	protected double stepHeight;
+
+	protected double addedMargin; // @todo: remove this and fix the code
 
 	// this is the desired walk direction, set by the user
-	protected Vector3f walkDirection = new Vector3f();
-	protected Vector3f normalizedDirection = new Vector3f();
+	protected Vector3d walkDirection = new Vector3d();
+	protected Vector3d normalizedDirection = new Vector3d();
 
 	// some internal variables
-	protected Vector3f currentPosition = new Vector3f();
-	protected float currentStepOffset;
-	protected Vector3f targetPosition = new Vector3f();
+	protected Vector3d currentPosition = new Vector3d();
+	protected double currentStepOffset;
+	protected Vector3d targetPosition = new Vector3d();
 
 	// keep track of the contact manifolds
 	ObjectArrayList<PersistentManifold> manifoldArray = new ObjectArrayList<PersistentManifold>();
 
 	protected boolean touchingContact;
-	protected Vector3f touchingNormal = new Vector3f();
+	protected Vector3d touchingNormal = new Vector3d();
 
 	protected boolean wasOnGround;
-	
+
 	protected boolean useGhostObjectSweepTest;
 	protected boolean useWalkDirection;
-	protected float velocityTimeInterval;
+	protected double velocityTimeInterval;
 	protected int upAxis;
 
 	protected CollisionObject me;
 
-	public KinematicCharacterController(PairCachingGhostObject ghostObject, ConvexShape convexShape, float stepHeight) {
+	public KinematicCharacterController(PairCachingGhostObject ghostObject, ConvexShape convexShape, double stepHeight) {
 		this(ghostObject, convexShape, stepHeight, 1);
 	}
 
-	public KinematicCharacterController(PairCachingGhostObject ghostObject, ConvexShape convexShape, float stepHeight, int upAxis) {
+	public KinematicCharacterController(PairCachingGhostObject ghostObject, ConvexShape convexShape, double stepHeight, int upAxis) {
 		this.upAxis = upAxis;
 		this.addedMargin = 0.02f;
 		this.walkDirection.set(0, 0, 0);
@@ -129,7 +129,7 @@ public class KinematicCharacterController extends ActionInterface {
 		this.fallSpeed = 55.0f; // Terminal velocity of a sky diver in m/s.
 		this.jumpSpeed = 10.0f; // ?
 		this.wasOnGround = false;
-		setMaxSlope((float)((50.0f/180.0f) * Math.PI));
+		setMaxSlope((double)((50.0f/180.0f) * Math.PI));
 	}
 
 	private PairCachingGhostObject getGhostObject() {
@@ -137,7 +137,7 @@ public class KinematicCharacterController extends ActionInterface {
 	}
 
 	// ActionInterface interface
-	public void updateAction(CollisionWorld collisionWorld, float deltaTime) {
+	public void updateAction(CollisionWorld collisionWorld, double deltaTime) {
 		preStep(collisionWorld);
 		playerStep(collisionWorld, deltaTime);
 	}
@@ -163,10 +163,10 @@ public class KinematicCharacterController extends ActionInterface {
 	 *
 	 * This call will reset any velocity set by {@link #setVelocityForTimeInterval}.
 	 */
-	public void	setWalkDirection(Vector3f walkDirection) {
+	public void	setWalkDirection(Vector3d walkDirection) {
 		useWalkDirection = true;
 		this.walkDirection.set(walkDirection);
-		normalizedDirection.set(getNormalizedVector(walkDirection, Stack.alloc(Vector3f.class)));
+		normalizedDirection.set(getNormalizedVector(walkDirection, Stack.alloc(Vector3d.class)));
 	}
 
 	/**
@@ -175,17 +175,17 @@ public class KinematicCharacterController extends ActionInterface {
 	 * This call will reset any walk direction set by {@link #setWalkDirection}.
 	 * Negative time intervals will result in no motion.
 	 */
-	public void setVelocityForTimeInterval(Vector3f velocity, float timeInterval) {
+	public void setVelocityForTimeInterval(Vector3d velocity, double timeInterval) {
 		useWalkDirection = false;
 		walkDirection.set(velocity);
-		normalizedDirection.set(getNormalizedVector(walkDirection, Stack.alloc(Vector3f.class)));
+		normalizedDirection.set(getNormalizedVector(walkDirection, Stack.alloc(Vector3d.class)));
 		velocityTimeInterval = timeInterval;
 	}
 
 	public void reset() {
 	}
 
-	public void warp(Vector3f origin) {
+	public void warp(Vector3d origin) {
 		Transform xform = Stack.alloc(Transform.class);
 		xform.setIdentity();
 		xform.origin.set(origin);
@@ -208,8 +208,8 @@ public class KinematicCharacterController extends ActionInterface {
 		targetPosition.set(currentPosition);
 		//printf("m_targetPosition=%f,%f,%f\n",m_targetPosition[0],m_targetPosition[1],m_targetPosition[2]);
 	}
-	
-	public void playerStep(CollisionWorld collisionWorld, float dt) {
+
+	public void playerStep(CollisionWorld collisionWorld, double dt) {
 		//printf("playerStep(): ");
 		//printf("  dt = %f", dt);
 
@@ -218,9 +218,9 @@ public class KinematicCharacterController extends ActionInterface {
 			//printf("\n");
 			return; // no motion
 		}
-		
+
 		wasOnGround = onGround();
-		
+
 		// Update fall velocity.
 		verticalVelocity -= gravity * dt;
 		if(verticalVelocity > 0.0 && verticalVelocity > jumpSpeed)
@@ -248,11 +248,11 @@ public class KinematicCharacterController extends ActionInterface {
 			//printf("  time: %f", m_velocityTimeInterval);
 
 			// still have some time left for moving!
-			float dtMoving = (dt < velocityTimeInterval) ? dt : velocityTimeInterval;
+			double dtMoving = (dt < velocityTimeInterval) ? dt : velocityTimeInterval;
 			velocityTimeInterval -= dt;
 
 			// how far will we move while we are moving?
-			Vector3f move = Stack.alloc(Vector3f.class);
+			Vector3d move = Stack.alloc(Vector3d.class);
 			move.scale(dtMoving, walkDirection);
 
 			//printf("  dtMoving: %f", dtMoving);
@@ -268,25 +268,25 @@ public class KinematicCharacterController extends ActionInterface {
 		ghostObject.setWorldTransform(xform);
 	}
 
-	public void setFallSpeed(float fallSpeed) {
+	public void setFallSpeed(double fallSpeed) {
 		this.fallSpeed = fallSpeed;
 	}
-	
-	public void setJumpSpeed(float jumpSpeed) {
+
+	public void setJumpSpeed(double jumpSpeed) {
 		this.jumpSpeed = jumpSpeed;
 	}
 
-	public void setMaxJumpHeight(float maxJumpHeight) {
+	public void setMaxJumpHeight(double maxJumpHeight) {
 		this.maxJumpHeight = maxJumpHeight;
 	}
-	
+
 	public boolean canJump() {
 		return onGround();
 	}
-	
+
 	public void jump() {
 		if (!canJump()) return;
-		
+
 		verticalVelocity = jumpSpeed;
 
 		//#if 0
@@ -299,30 +299,30 @@ public class KinematicCharacterController extends ActionInterface {
 		//m_rigidBody->applyCentralImpulse (up * magnitude);
 		//#endif
 	}
-	
-	public void setGravity(float gravity) {
+
+	public void setGravity(double gravity) {
 		this.gravity = gravity;
 	}
-	
-	public float getGravity() {
+
+	public double getGravity() {
 		return gravity;
 	}
-	
-	public void setMaxSlope(float slopeRadians) {
+
+	public void setMaxSlope(double slopeRadians) {
 		maxSlopeRadians = slopeRadians;
-		maxSlopeCosine = (float)Math.cos((float)slopeRadians);
+		maxSlopeCosine = (double)Math.cos((double)slopeRadians);
 	}
-	
-	public float getMaxSlope() {
+
+	public double getMaxSlope() {
 		return maxSlopeRadians;
 	}
-	
+
 	public boolean onGround() {
 		return verticalVelocity == 0.0f && verticalOffset == 0.0f;
 	}
 
 	// static helper method
-	private static Vector3f getNormalizedVector(Vector3f v, Vector3f out) {
+	private static Vector3d getNormalizedVector(Vector3d v, Vector3d out) {
 		out.set(v);
 		out.normalize();
 		if (out.length() < BulletGlobals.SIMD_EPSILON) {
@@ -337,7 +337,7 @@ public class KinematicCharacterController extends ActionInterface {
 	 *
 	 * From: http://www-cs-students.stanford.edu/~adityagp/final/node3.html
 	 */
-	protected Vector3f computeReflectionDirection(Vector3f direction, Vector3f normal, Vector3f out) {
+	protected Vector3d computeReflectionDirection(Vector3d direction, Vector3d normal, Vector3d out) {
 		// return direction - (btScalar(2.0) * direction.dot(normal)) * normal;
 		out.set(normal);
 		out.scale(-2.0f * direction.dot(normal));
@@ -348,7 +348,7 @@ public class KinematicCharacterController extends ActionInterface {
 	/**
 	 * Returns the portion of 'direction' that is parallel to 'normal'
 	 */
-	protected Vector3f parallelComponent(Vector3f direction, Vector3f normal, Vector3f out) {
+	protected Vector3d parallelComponent(Vector3d direction, Vector3d normal, Vector3d out) {
 		//btScalar magnitude = direction.dot(normal);
 		//return normal * magnitude;
 		out.set(normal);
@@ -359,9 +359,9 @@ public class KinematicCharacterController extends ActionInterface {
 	/**
 	 * Returns the portion of 'direction' that is perpindicular to 'normal'
 	 */
-	protected Vector3f perpindicularComponent(Vector3f direction, Vector3f normal, Vector3f out) {
+	protected Vector3d perpindicularComponent(Vector3d direction, Vector3d normal, Vector3d out) {
 		//return direction - parallelComponent(direction, normal);
-		Vector3f perpendicular = parallelComponent(direction, normal, out);
+		Vector3d perpendicular = parallelComponent(direction, normal, out);
 		perpendicular.scale(-1);
 		perpendicular.add(direction);
 		return perpendicular;
@@ -375,7 +375,7 @@ public class KinematicCharacterController extends ActionInterface {
 
 		currentPosition.set(ghostObject.getWorldTransform(Stack.alloc(Transform.class)).origin);
 
-		float maxPen = 0.0f;
+		double maxPen = 0.0f;
 		for (int i=0; i<ghostObject.getOverlappingPairCache().getNumOverlappingPairs(); i++) {
 			manifoldArray.clear();
 
@@ -387,11 +387,11 @@ public class KinematicCharacterController extends ActionInterface {
 
 			for (int j=0; j<manifoldArray.size(); j++) {
 				PersistentManifold manifold = manifoldArray.getQuick(j);
-				float directionSign = manifold.getBody0() == ghostObject? -1.0f : 1.0f;
+				double directionSign = manifold.getBody0() == ghostObject? -1.0f : 1.0f;
 				for (int p=0; p<manifold.getNumContacts(); p++) {
 					ManifoldPoint pt = manifold.getContactPoint(p);
 
-					float dist = pt.getDistance();
+					double dist = pt.getDistance();
 					if (dist < 0.0f) {
 						if (dist < maxPen) {
 							maxPen = dist;
@@ -411,7 +411,7 @@ public class KinematicCharacterController extends ActionInterface {
 				//manifold->clearManifold();
 			}
 		}
-		
+
 		Transform newTrans = ghostObject.getWorldTransform(Stack.alloc(Transform.class));
 		newTrans.origin.set(currentPosition);
 		ghostObject.setWorldTransform(newTrans);
@@ -421,7 +421,7 @@ public class KinematicCharacterController extends ActionInterface {
 
 		return penetration;
 	}
-	
+
 	protected void stepUp(CollisionWorld world) {
 		// phase 1: up
 		Transform start = Stack.alloc(Transform.class);
@@ -434,9 +434,9 @@ public class KinematicCharacterController extends ActionInterface {
 		/* FIXME: Handle penetration properly */
 		start.origin.scaleAdd(convexShape.getMargin() + addedMargin, upAxisDirection[upAxis], currentPosition);
 		end.origin.set(targetPosition);
-		
+
 		// Find only sloped/flat surface hits, avoid wall and ceiling hits...
-		Vector3f up = Stack.alloc(Vector3f.class);
+		Vector3d up = Stack.alloc(Vector3d.class);
 		up.scale(-1f, upAxisDirection[upAxis]);
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, up, 0.0f);
 		callback.collisionFilterGroup = getGhostObject().getBroadphaseHandle().collisionFilterGroup;
@@ -462,34 +462,34 @@ public class KinematicCharacterController extends ActionInterface {
 		}
 	}
 
-	protected void updateTargetPositionBasedOnCollision (Vector3f hitNormal) {
+	protected void updateTargetPositionBasedOnCollision (Vector3d hitNormal) {
 		updateTargetPositionBasedOnCollision(hitNormal, 0f, 1f);
 	}
 
-	protected void updateTargetPositionBasedOnCollision(Vector3f hitNormal, float tangentMag, float normalMag) {
-		Vector3f movementDirection = Stack.alloc(Vector3f.class);
+	protected void updateTargetPositionBasedOnCollision(Vector3d hitNormal, double tangentMag, double normalMag) {
+		Vector3d movementDirection = Stack.alloc(Vector3d.class);
 		movementDirection.sub(targetPosition, currentPosition);
-		float movementLength = movementDirection.length();
+		double movementLength = movementDirection.length();
 		if (movementLength>BulletGlobals.SIMD_EPSILON) {
 			movementDirection.normalize();
 
-			Vector3f reflectDir = computeReflectionDirection(movementDirection, hitNormal, Stack.alloc(Vector3f.class));
+			Vector3d reflectDir = computeReflectionDirection(movementDirection, hitNormal, Stack.alloc(Vector3d.class));
 			reflectDir.normalize();
 
-			Vector3f parallelDir = parallelComponent(reflectDir, hitNormal, Stack.alloc(Vector3f.class));
-			Vector3f perpindicularDir = perpindicularComponent(reflectDir, hitNormal, Stack.alloc(Vector3f.class));
+			Vector3d parallelDir = parallelComponent(reflectDir, hitNormal, Stack.alloc(Vector3d.class));
+			Vector3d perpindicularDir = perpindicularComponent(reflectDir, hitNormal, Stack.alloc(Vector3d.class));
 
 			targetPosition.set(currentPosition);
 			if (false) //tangentMag != 0.0)
 			{
-				Vector3f parComponent = Stack.alloc(Vector3f.class);
+				Vector3d parComponent = Stack.alloc(Vector3d.class);
 				parComponent.scale(tangentMag * movementLength, parallelDir);
 				//printf("parComponent=%f,%f,%f\n",parComponent[0],parComponent[1],parComponent[2]);
 				targetPosition.add(parComponent);
 			}
 
 			if (normalMag != 0.0f) {
-				Vector3f perpComponent = Stack.alloc(Vector3f.class);
+				Vector3d perpComponent = Stack.alloc(Vector3d.class);
 				perpComponent.scale(normalMag * movementLength, perpindicularDir);
 				//printf("perpComponent=%f,%f,%f\n",perpComponent[0],perpComponent[1],perpComponent[2]);
 				targetPosition.add(perpComponent);
@@ -500,7 +500,7 @@ public class KinematicCharacterController extends ActionInterface {
 		}
 	}
 
-	protected void stepForwardAndStrafe(CollisionWorld collisionWorld, Vector3f walkMove) {
+	protected void stepForwardAndStrafe(CollisionWorld collisionWorld, Vector3d walkMove) {
 		// printf("m_normalizedDirection=%f,%f,%f\n",
 		// 	m_normalizedDirection[0],m_normalizedDirection[1],m_normalizedDirection[2]);
 		// phase 2: forward and strafe
@@ -510,10 +510,10 @@ public class KinematicCharacterController extends ActionInterface {
 		start.setIdentity ();
 		end.setIdentity ();
 
-		float fraction = 1.0f;
-		Vector3f distance2Vec = Stack.alloc(Vector3f.class);
+		double fraction = 1.0f;
+		Vector3d distance2Vec = Stack.alloc(Vector3d.class);
 		distance2Vec.sub(currentPosition, targetPosition);
-		float distance2 = distance2Vec.lengthSquared();
+		double distance2 = distance2Vec.lengthSquared();
 		//printf("distance2=%f\n",distance2);
 
 		/*if (touchingContact) {
@@ -532,7 +532,7 @@ public class KinematicCharacterController extends ActionInterface {
 			callback.collisionFilterGroup = getGhostObject().getBroadphaseHandle().collisionFilterGroup;
 			callback.collisionFilterMask = getGhostObject().getBroadphaseHandle().collisionFilterMask;
 
-			float margin = convexShape.getMargin();
+			double margin = convexShape.getMargin();
 			convexShape.setMargin(margin + addedMargin);
 
 			if (useGhostObjectSweepTest) {
@@ -548,9 +548,9 @@ public class KinematicCharacterController extends ActionInterface {
 
 			if (callback.hasHit()) {
 				// we moved only a fraction
-				Vector3f hitDistanceVec = Stack.alloc(Vector3f.class);
+				Vector3d hitDistanceVec = Stack.alloc(Vector3d.class);
 				hitDistanceVec.sub(callback.hitPointWorld, currentPosition);
-				//float hitDistance = hitDistanceVec.length();
+				//double hitDistance = hitDistanceVec.length();
 
 				// if the distance is farther than the collision margin, move
 				//if (hitDistance > addedMargin) {
@@ -560,7 +560,7 @@ public class KinematicCharacterController extends ActionInterface {
 
 				updateTargetPositionBasedOnCollision(callback.hitNormalWorld);
 
-				Vector3f currentDir = Stack.alloc(Vector3f.class);
+				Vector3d currentDir = Stack.alloc(Vector3d.class);
 				currentDir.sub(targetPosition, currentPosition);
 				distance2 = currentDir.lengthSquared();
 				if (distance2 > BulletGlobals.SIMD_EPSILON) {
@@ -585,16 +585,16 @@ public class KinematicCharacterController extends ActionInterface {
 		}
 	}
 
-	protected void stepDown(CollisionWorld collisionWorld, float dt) {
+	protected void stepDown(CollisionWorld collisionWorld, double dt) {
 		Transform start = Stack.alloc(Transform.class);
 		Transform end = Stack.alloc(Transform.class);
 
 		// phase 3: down
-		float additionalDownStep = (wasOnGround /*&& !onGround()*/) ? stepHeight : 0.0f;
-		Vector3f step_drop = Stack.alloc(Vector3f.class);
+		double additionalDownStep = (wasOnGround /*&& !onGround()*/) ? stepHeight : 0.0f;
+		Vector3d step_drop = Stack.alloc(Vector3d.class);
 		step_drop.scale(currentStepOffset + additionalDownStep, upAxisDirection[upAxis]);
-		float downVelocity = (additionalDownStep == 0.0f && verticalVelocity<0.0f?-verticalVelocity:0.0f) * dt;
-		Vector3f gravity_drop = Stack.alloc(Vector3f.class);
+		double downVelocity = (additionalDownStep == 0.0f && verticalVelocity<0.0f?-verticalVelocity:0.0f) * dt;
+		Vector3d gravity_drop = Stack.alloc(Vector3d.class);
 		gravity_drop.scale(downVelocity, upAxisDirection[upAxis]);
 		targetPosition.sub(step_drop);
 		targetPosition.sub(gravity_drop);
@@ -634,12 +634,12 @@ public class KinematicCharacterController extends ActionInterface {
 		protected CollisionObject me;
 
 		public KinematicClosestNotMeRayResultCallback(CollisionObject me) {
-			super(new Vector3f(), new Vector3f());
+			super(new Vector3d(), new Vector3d());
 			this.me = me;
 		}
 
 		@Override
-		public float addSingleResult(CollisionWorld.LocalRayResult rayResult, boolean normalInWorldSpace) {
+		public double addSingleResult(CollisionWorld.LocalRayResult rayResult, boolean normalInWorldSpace) {
 			if (rayResult.collisionObject == me) {
 				return 1.0f;
 			}
@@ -652,32 +652,32 @@ public class KinematicCharacterController extends ActionInterface {
 
 	private static class KinematicClosestNotMeConvexResultCallback extends CollisionWorld.ClosestConvexResultCallback {
 		protected CollisionObject me;
-		protected final Vector3f up;
-		protected float minSlopeDot;
+		protected final Vector3d up;
+		protected double minSlopeDot;
 
-		public KinematicClosestNotMeConvexResultCallback(CollisionObject me, final Vector3f up, float minSlopeDot) {
-			super(new Vector3f(), new Vector3f());
+		public KinematicClosestNotMeConvexResultCallback(CollisionObject me, final Vector3d up, double minSlopeDot) {
+			super(new Vector3d(), new Vector3d());
 			this.me = me;
 			this.up = up;
 			this.minSlopeDot = minSlopeDot;
 		}
 
 		@Override
-		public float addSingleResult(CollisionWorld.LocalConvexResult convexResult, boolean normalInWorldSpace) {
+		public double addSingleResult(CollisionWorld.LocalConvexResult convexResult, boolean normalInWorldSpace) {
 			if (convexResult.hitCollisionObject == me) {
 				return 1.0f;
 			}
-			
-			Vector3f hitNormalWorld;
+
+			Vector3d hitNormalWorld;
 			if (normalInWorldSpace) {
 				hitNormalWorld = convexResult.hitNormalLocal;
 			} else {
 				//need to transform normal into worldspace
-				hitNormalWorld = Stack.alloc(Vector3f.class);
+				hitNormalWorld = Stack.alloc(Vector3d.class);
 				hitCollisionObject.getWorldTransform(Stack.alloc(Transform.class)).basis.transform(convexResult.hitNormalLocal, hitNormalWorld);
 			}
-			
-			float dotUp = up.dot(hitNormalWorld);
+
+			double dotUp = up.dot(hitNormalWorld);
 			if (dotUp < minSlopeDot) {
 				return 1.0f;
 			}
@@ -685,5 +685,5 @@ public class KinematicCharacterController extends ActionInterface {
 			return super.addSingleResult(convexResult, normalInWorldSpace);
 		}
 	}
-	
+
 }

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -32,7 +32,7 @@ import com.bulletphysics.linearmath.VectorUtil;
 import com.bulletphysics.util.IntArrayList;
 import com.bulletphysics.util.ObjectArrayList;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * HullLibrary class can create a convex hull from a collection of vertices, using
@@ -46,10 +46,10 @@ public class HullLibrary {
 	public final IntArrayList vertexIndexMapping = new IntArrayList();
 
 	private ObjectArrayList<Tri> tris = new ObjectArrayList<Tri>();
-	
+
 	/**
 	 * Converts point cloud to polygonal representation.
-	 * 
+	 *
 	 * @param desc   describes the input request
 	 * @param result contains the result
 	 * @return whether conversion was successful
@@ -61,11 +61,11 @@ public class HullLibrary {
 
 		int vcount = desc.vcount;
 		if (vcount < 8) vcount = 8;
-		
-		ObjectArrayList<Vector3f> vertexSource = new ObjectArrayList<Vector3f>();
-		MiscUtil.resize(vertexSource, vcount, Vector3f.class);
 
-		Vector3f scale = Stack.alloc(Vector3f.class);
+		ObjectArrayList<Vector3d> vertexSource = new ObjectArrayList<Vector3d>();
+		MiscUtil.resize(vertexSource, vcount, Vector3d.class);
+
+		Vector3d scale = Stack.alloc(Vector3d.class);
 
 		int[] ovcount = new int[1];
 
@@ -75,7 +75,7 @@ public class HullLibrary {
 			//		if ( 1 ) // scale vertices back to their original size.
 			{
 				for (int i=0; i<ovcount[0]; i++) {
-					Vector3f v = vertexSource.getQuick(i);
+					Vector3d v = vertexSource.getQuick(i);
 					VectorUtil.mul(v, v, scale);
 				}
 			}
@@ -84,8 +84,8 @@ public class HullLibrary {
 
 			if (ok) {
 				// re-index triangle mesh so it refers to only used vertices, rebuild a new vertex table.
-				ObjectArrayList<Vector3f> vertexScratch = new ObjectArrayList<Vector3f>();
-				MiscUtil.resize(vertexScratch, hr.vcount, Vector3f.class);
+				ObjectArrayList<Vector3d> vertexScratch = new ObjectArrayList<Vector3d>();
+				MiscUtil.resize(vertexScratch, hr.vcount, Vector3d.class);
 
 				bringOutYourDead(hr.vertices, hr.vcount, vertexScratch, ovcount, hr.indices, hr.indexCount);
 
@@ -94,7 +94,7 @@ public class HullLibrary {
 				if (desc.hasHullFlag(HullFlags.TRIANGLES)) { // if he wants the results as triangle!
 					result.polygons = false;
 					result.numOutputVertices = ovcount[0];
-					MiscUtil.resize(result.outputVertices, ovcount[0], Vector3f.class);
+					MiscUtil.resize(result.outputVertices, ovcount[0], Vector3d.class);
 					result.numFaces = hr.faceCount;
 					result.numIndices = hr.indexCount;
 
@@ -128,7 +128,7 @@ public class HullLibrary {
 				else {
 					result.polygons = true;
 					result.numOutputVertices = ovcount[0];
-					MiscUtil.resize(result.outputVertices, ovcount[0], Vector3f.class);
+					MiscUtil.resize(result.outputVertices, ovcount[0], Vector3d.class);
 					result.numFaces = hr.faceCount;
 					result.numIndices = hr.indexCount + hr.faceCount;
 					MiscUtil.resize(result.indices, result.numIndices, 0);
@@ -168,7 +168,7 @@ public class HullLibrary {
 
 		return ret;
 	}
-	
+
 	/**
 	 * Release memory allocated for this result, we are done with it.
 	 */
@@ -184,7 +184,7 @@ public class HullLibrary {
 		return true;
 	}
 
-	private boolean computeHull(int vcount, ObjectArrayList<Vector3f> vertices, PHullResult result, int vlimit) {
+	private boolean computeHull(int vcount, ObjectArrayList<Vector3d> vertices, PHullResult result, int vlimit) {
 		int[] tris_count = new int[1];
 		int ret = calchull(vertices, vcount, result.indices, tris_count, vlimit);
 		if (ret == 0) return false;
@@ -202,12 +202,12 @@ public class HullLibrary {
 
 		return tr;
 	}
-	
+
 	private void deAllocateTriangle(Tri tri) {
 		assert (tris.getQuick(tri.id) == tri);
 		tris.setQuick(tri.id, null);
 	}
-	
+
 	private void b2bfix(Tri s, Tri t) {
 		for (int i=0; i<3; i++) {
 			int i1 = (i + 1) % 3;
@@ -241,7 +241,7 @@ public class HullLibrary {
 		}
 	}
 
-	private Tri extrudable(float epsilon) {
+	private Tri extrudable(double epsilon) {
 		Tri t = null;
 		for (int i=0; i<tris.size(); i++) {
 			if (t == null || (tris.getQuick(i) != null && t.rise < tris.getQuick(i).rise)) {
@@ -251,10 +251,10 @@ public class HullLibrary {
 		return (t.rise > epsilon) ? t : null;
 	}
 
-	private int calchull(ObjectArrayList<Vector3f> verts, int verts_count, IntArrayList tris_out, int[] tris_count, int vlimit) {
+	private int calchull(ObjectArrayList<Vector3d> verts, int verts_count, IntArrayList tris_out, int[] tris_count, int vlimit) {
 		int rc = calchullgen(verts, verts_count, vlimit);
 		if (rc == 0) return 0;
-		
+
 		IntArrayList ts = new IntArrayList();
 
 		for (int i=0; i<tris.size(); i++) {
@@ -276,19 +276,19 @@ public class HullLibrary {
 		return 1;
 	}
 
-	private int calchullgen(ObjectArrayList<Vector3f> verts, int verts_count, int vlimit) {
+	private int calchullgen(ObjectArrayList<Vector3d> verts, int verts_count, int vlimit) {
 		if (verts_count < 4) return 0;
-		
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
 		if (vlimit == 0) {
 			vlimit = 1000000000;
 		}
 		//int j;
-		Vector3f bmin = Stack.alloc((Vector3f) verts.getQuick(0));
-		Vector3f bmax = Stack.alloc((Vector3f) verts.getQuick(0));
+		Vector3d bmin = Stack.alloc((Vector3d) verts.getQuick(0));
+		Vector3d bmax = Stack.alloc((Vector3d) verts.getQuick(0));
 		IntArrayList isextreme = new IntArrayList();
 		//isextreme.reserve(verts_count);
 		IntArrayList allow = new IntArrayList();
@@ -301,7 +301,7 @@ public class HullLibrary {
 			VectorUtil.setMax(bmax, verts.getQuick(j));
 		}
 		tmp.sub(bmax, bmin);
-		float epsilon = tmp.length() * 0.001f;
+		double epsilon = tmp.length() * 0.001f;
 		assert (epsilon != 0f);
 
 		Int4 p = findSimplex(verts, verts_count, allow, new Int4());
@@ -310,7 +310,7 @@ public class HullLibrary {
 
 		// a valid interior point
 		}
-		Vector3f center = Stack.alloc(Vector3f.class);
+		Vector3d center = Stack.alloc(Vector3d.class);
 		VectorUtil.add(center, verts.getQuick(p.getCoord(0)), verts.getQuick(p.getCoord(1)), verts.getQuick(p.getCoord(2)), verts.getQuick(p.getCoord(3)));
 		center.scale(1f / 4f);
 
@@ -331,7 +331,7 @@ public class HullLibrary {
 		checkit(t2);
 		checkit(t3);
 
-		Vector3f n = Stack.alloc(Vector3f.class);
+		Vector3d n = Stack.alloc(Vector3d.class);
 
 		for (int j=0; j<tris.size(); j++) {
 			Tri t = tris.getQuick(j);
@@ -407,12 +407,12 @@ public class HullLibrary {
 		return 1;
 	}
 
-	private Int4 findSimplex(ObjectArrayList<Vector3f> verts, int verts_count, IntArrayList allow, Int4 out) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+	private Int4 findSimplex(ObjectArrayList<Vector3d> verts, int verts_count, IntArrayList allow, Int4 out) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
-		Vector3f[] basis = new Vector3f[/*3*/] { Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class) };
+		Vector3d[] basis = new Vector3d[/*3*/] { Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class) };
 		basis[0].set(0.01f, 0.02f, 1.0f);
 		int p0 = maxdirsterid(verts, verts_count, basis[0], allow);
 		tmp.negate(basis[0]);
@@ -500,11 +500,11 @@ public class HullLibrary {
 
 	//private ConvexH test_cube();
 
-	//BringOutYourDead (John Ratcliff): When you create a convex hull you hand it a large input set of vertices forming a 'point cloud'. 
+	//BringOutYourDead (John Ratcliff): When you create a convex hull you hand it a large input set of vertices forming a 'point cloud'.
 	//After the hull is generated it give you back a set of polygon faces which index the *original* point cloud.
 	//The thing is, often times, there are many 'dead vertices' in the point cloud that are on longer referenced by the hull.
 	//The routine 'BringOutYourDead' find only the referenced vertices, copies them to an new buffer, and re-indexes the hull so that it is a minimal representation.
-	private void bringOutYourDead(ObjectArrayList<Vector3f> verts, int vcount, ObjectArrayList<Vector3f> overts, int[] ocount, IntArrayList indices, int indexcount) {
+	private void bringOutYourDead(ObjectArrayList<Vector3d> verts, int vcount, ObjectArrayList<Vector3d> overts, int[] ocount, IntArrayList indices, int indexcount) {
 		IntArrayList tmpIndices = new IntArrayList();
 		for (int i=0; i<vertexIndexMapping.size(); i++) {
 			tmpIndices.add(vertexIndexMapping.size());
@@ -549,16 +549,16 @@ public class HullLibrary {
 		}
 	}
 
-	private static final float EPSILON = 0.000001f; /* close enough to consider two btScalaring point numbers to be 'the same'. */
-	
+	private static final double EPSILON = 0.000001f; /* close enough to consider two btScalaring point numbers to be 'the same'. */
+
 	private boolean cleanupVertices(int svcount,
-			ObjectArrayList<Vector3f> svertices,
+			ObjectArrayList<Vector3d> svertices,
 			int stride,
 			int[] vcount, // output number of vertices
-			ObjectArrayList<Vector3f> vertices, // location to store the results.
-			float normalepsilon,
-			Vector3f scale) {
-		
+			ObjectArrayList<Vector3d> vertices, // location to store the results.
+			double normalepsilon,
+			Vector3d scale) {
+
 		if (svcount == 0) {
 			return false;
 		}
@@ -567,22 +567,22 @@ public class HullLibrary {
 
 		vcount[0] = 0;
 
-		float[] recip = new float[3];
+		double[] recip = new double[3];
 
 		if (scale != null) {
 			scale.set(1, 1, 1);
 		}
 
-		float[] bmin = new float[] { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
-		float[] bmax = new float[] { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
+		double[] bmin = new double[] { Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE };
+		double[] bmax = new double[] { -Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE };
 
-		ObjectArrayList<Vector3f> vtx_ptr = svertices;
+		ObjectArrayList<Vector3d> vtx_ptr = svertices;
 		int vtx_idx = 0;
 
 		//	if ( 1 )
 		{
 			for (int i=0; i<svcount; i++) {
-				Vector3f p = vtx_ptr.getQuick(vtx_idx);
+				Vector3d p = vtx_ptr.getQuick(vtx_idx);
 
 				vtx_idx +=/*stride*/ 1;
 
@@ -597,11 +597,11 @@ public class HullLibrary {
 			}
 		}
 
-		float dx = bmax[0] - bmin[0];
-		float dy = bmax[1] - bmin[1];
-		float dz = bmax[2] - bmin[2];
+		double dx = bmax[0] - bmin[0];
+		double dy = bmax[1] - bmin[1];
+		double dz = bmax[2] - bmin[2];
 
-		Vector3f center = Stack.alloc(Vector3f.class);
+		Vector3d center = Stack.alloc(Vector3d.class);
 
 		center.x = dx * 0.5f + bmin[0];
 		center.y = dy * 0.5f + bmin[1];
@@ -609,13 +609,13 @@ public class HullLibrary {
 
 		if (dx < EPSILON || dy < EPSILON || dz < EPSILON || svcount < 3) {
 
-			float len = Float.MAX_VALUE;
+			double len = Double.MAX_VALUE;
 
 			if (dx > EPSILON && dx < len) len = dx;
 			if (dy > EPSILON && dy < len) len = dy;
 			if (dz > EPSILON && dz < len) len = dz;
-			
-			if (len == Float.MAX_VALUE) {
+
+			if (len == Double.MAX_VALUE) {
 				dx = dy = dz = 0.01f; // one centimeter
 			}
 			else {
@@ -624,14 +624,14 @@ public class HullLibrary {
 				if (dz < EPSILON) dz = len * 0.05f;
 			}
 
-			float x1 = center.x - dx;
-			float x2 = center.x + dx;
+			double x1 = center.x - dx;
+			double x2 = center.x + dx;
 
-			float y1 = center.y - dy;
-			float y2 = center.y + dy;
+			double y1 = center.y - dy;
+			double y2 = center.y + dy;
 
-			float z1 = center.z - dz;
-			float z2 = center.z + dz;
+			double z1 = center.z - dz;
+			double z2 = center.z + dz;
 
 			addPoint(vcount, vertices, x1, y1, z1);
 			addPoint(vcount, vertices, x2, y1, z1);
@@ -664,12 +664,12 @@ public class HullLibrary {
 		vtx_idx = 0;
 
 		for (int i=0; i<svcount; i++) {
-			Vector3f p = vtx_ptr.getQuick(vtx_idx);
+			Vector3d p = vtx_ptr.getQuick(vtx_idx);
 			vtx_idx +=/*stride*/ 1;
 
-			float px = p.x;
-			float py = p.y;
-			float pz = p.z;
+			double px = p.x;
+			double py = p.y;
+			double pz = p.z;
 
 			if (scale != null) {
 				px = px * recip[0]; // normalize
@@ -683,11 +683,11 @@ public class HullLibrary {
 
 				for (j=0; j<vcount[0]; j++) {
 					/// XXX might be broken
-					Vector3f v = vertices.getQuick(j);
+					Vector3d v = vertices.getQuick(j);
 
-					float x = v.x;
-					float y = v.y;
-					float z = v.z;
+					double x = v.x;
+					double y = v.y;
+					double z = v.z;
 
 					dx = Math.abs(x - px);
 					dy = Math.abs(y - py);
@@ -698,8 +698,8 @@ public class HullLibrary {
 						// now let us see if it is further from the center of the point cloud than the one we already recorded.
 						// in which case we keep this one instead.
 
-						float dist1 = getDist(px, py, pz, center);
-						float dist2 = getDist(v.x, v.y, v.z, center);
+						double dist1 = getDist(px, py, pz, center);
+						double dist2 = getDist(v.x, v.y, v.z, center);
 
 						if (dist1 > dist2) {
 							v.x = px;
@@ -712,7 +712,7 @@ public class HullLibrary {
 				}
 
 				if (j == vcount[0]) {
-					Vector3f dest = vertices.getQuick(vcount[0]);
+					Vector3d dest = vertices.getQuick(vcount[0]);
 					dest.x = px;
 					dest.y = py;
 					dest.z = pz;
@@ -726,11 +726,11 @@ public class HullLibrary {
 		// ok..now make sure we didn't prune so many vertices it is now invalid.
 		//	if ( 1 )
 		{
-			bmin = new float[] { Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE };
-			bmax = new float[] { -Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE };
+			bmin = new double[] { Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE };
+			bmax = new double[] { -Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE };
 
 			for (int i=0; i<vcount[0]; i++) {
-				Vector3f p = vertices.getQuick(i);
+				Vector3d p = vertices.getQuick(i);
 				for (int j = 0; j < 3; j++) {
 					if (VectorUtil.getCoord(p, j) < bmin[j]) {
 						bmin[j] = VectorUtil.getCoord(p, j);
@@ -746,17 +746,17 @@ public class HullLibrary {
 			dz = bmax[2] - bmin[2];
 
 			if (dx < EPSILON || dy < EPSILON || dz < EPSILON || vcount[0] < 3) {
-				float cx = dx * 0.5f + bmin[0];
-				float cy = dy * 0.5f + bmin[1];
-				float cz = dz * 0.5f + bmin[2];
+				double cx = dx * 0.5f + bmin[0];
+				double cy = dy * 0.5f + bmin[1];
+				double cz = dz * 0.5f + bmin[2];
 
-				float len = Float.MAX_VALUE;
+				double len = Double.MAX_VALUE;
 
 				if (dx >= EPSILON && dx < len) len = dx;
 				if (dy >= EPSILON && dy < len) len = dy;
 				if (dz >= EPSILON && dz < len) len = dz;
-				
-				if (len == Float.MAX_VALUE) {
+
+				if (len == Double.MAX_VALUE) {
 					dx = dy = dz = 0.01f; // one centimeter
 				}
 				else {
@@ -765,14 +765,14 @@ public class HullLibrary {
 					if (dz < EPSILON) dz = len * 0.05f;
 				}
 
-				float x1 = cx - dx;
-				float x2 = cx + dx;
+				double x1 = cx - dx;
+				double x2 = cx + dx;
 
-				float y1 = cy - dy;
-				float y2 = cy + dy;
+				double y1 = cy - dy;
+				double y2 = cy + dy;
 
-				float z1 = cz - dz;
-				float z2 = cz + dz;
+				double z1 = cz - dz;
+				double z2 = cz + dz;
 
 				vcount[0] = 0; // add box
 
@@ -793,17 +793,17 @@ public class HullLibrary {
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	private static boolean hasvert(Int3 t, int v) {
 		return (t.getCoord(0) == v || t.getCoord(1) == v || t.getCoord(2) == v);
 	}
-	
-	private static Vector3f orth(Vector3f v, Vector3f out) {
-		Vector3f a = Stack.alloc(Vector3f.class);
+
+	private static Vector3d orth(Vector3d v, Vector3d out) {
+		Vector3d a = Stack.alloc(Vector3d.class);
 		a.set(0f, 0f, 1f);
 		a.cross(v, a);
 
-		Vector3f b = Stack.alloc(Vector3f.class);
+		Vector3d b = Stack.alloc(Vector3d.class);
 		b.set(0f, 1f, 0f);
 		b.cross(v, b);
 
@@ -816,8 +816,8 @@ public class HullLibrary {
 			return out;
 		}
 	}
-	
-	private static int maxdirfiltered(ObjectArrayList<Vector3f> p, int count, Vector3f dir, IntArrayList allow) {
+
+	private static int maxdirfiltered(ObjectArrayList<Vector3d> p, int count, Vector3d dir, IntArrayList allow) {
 		assert (count != 0);
 		int m = -1;
 		for (int i=0; i<count; i++) {
@@ -830,13 +830,13 @@ public class HullLibrary {
 		assert (m != -1);
 		return m;
 	}
-	
-	private static int maxdirsterid(ObjectArrayList<Vector3f> p, int count, Vector3f dir, IntArrayList allow) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
-		Vector3f u = Stack.alloc(Vector3f.class);
-		Vector3f v = Stack.alloc(Vector3f.class);
+
+	private static int maxdirsterid(ObjectArrayList<Vector3d> p, int count, Vector3d dir, IntArrayList allow) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
+		Vector3d u = Stack.alloc(Vector3d.class);
+		Vector3d v = Stack.alloc(Vector3d.class);
 
 		int m = -1;
 		while (m == -1) {
@@ -847,9 +847,9 @@ public class HullLibrary {
 			orth(dir, u);
 			v.cross(u, dir);
 			int ma = -1;
-			for (float x = 0f; x <= 360f; x += 45f) {
-				float s = (float) Math.sin(BulletGlobals.SIMD_RADS_PER_DEG * (x));
-				float c = (float) Math.cos(BulletGlobals.SIMD_RADS_PER_DEG * (x));
+			for (double x = 0f; x <= 360f; x += 45f) {
+				double s = (double) Math.sin(BulletGlobals.SIMD_RADS_PER_DEG * (x));
+				double c = (double) Math.cos(BulletGlobals.SIMD_RADS_PER_DEG * (x));
 
 				tmp1.scale(s, u);
 				tmp2.scale(c, v);
@@ -863,9 +863,9 @@ public class HullLibrary {
 				}
 				if (ma != -1 && ma != mb) { // Yuck - this is really ugly
 					int mc = ma;
-					for (float xx = x - 40f; xx <= x; xx += 5f) {
-						s = (float)Math.sin(BulletGlobals.SIMD_RADS_PER_DEG * (xx));
-						c = (float)Math.cos(BulletGlobals.SIMD_RADS_PER_DEG * (xx));
+					for (double xx = x - 40f; xx <= x; xx += 5f) {
+						s = (double)Math.sin(BulletGlobals.SIMD_RADS_PER_DEG * (xx));
+						c = (double)Math.cos(BulletGlobals.SIMD_RADS_PER_DEG * (xx));
 
 						tmp1.scale(s, u);
 						tmp2.scale(c, v);
@@ -889,18 +889,18 @@ public class HullLibrary {
 		assert (false);
 		return m;
 	}
-	
-	private static Vector3f triNormal(Vector3f v0, Vector3f v1, Vector3f v2, Vector3f out) {
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+
+	private static Vector3d triNormal(Vector3d v0, Vector3d v1, Vector3d v2, Vector3d out) {
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
 		// return the normal of the triangle
 		// inscribed by v0, v1, and v2
 		tmp1.sub(v1, v0);
 		tmp2.sub(v2, v1);
-		Vector3f cp = Stack.alloc(Vector3f.class);
+		Vector3d cp = Stack.alloc(Vector3d.class);
 		cp.cross(tmp1, tmp2);
-		float m = cp.length();
+		double m = cp.length();
 		if (m == 0) {
 			out.set(1f, 0f, 0f);
 			return out;
@@ -908,14 +908,14 @@ public class HullLibrary {
 		out.scale(1f / m, cp);
 		return out;
 	}
-	
-	private static boolean above(ObjectArrayList<Vector3f> vertices, Int3 t, Vector3f p, float epsilon) {
-		Vector3f n = triNormal(vertices.getQuick(t.getCoord(0)), vertices.getQuick(t.getCoord(1)), vertices.getQuick(t.getCoord(2)), Stack.alloc(Vector3f.class));
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+
+	private static boolean above(ObjectArrayList<Vector3d> vertices, Int3 t, Vector3d p, double epsilon) {
+		Vector3d n = triNormal(vertices.getQuick(t.getCoord(0)), vertices.getQuick(t.getCoord(1)), vertices.getQuick(t.getCoord(2)), Stack.alloc(Vector3d.class));
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		tmp.sub(p, vertices.getQuick(t.getCoord(0)));
 		return (n.dot(tmp) > epsilon); // EPSILON???
 	}
-	
+
 	private static void releaseHull(PHullResult result) {
 		if (result.indices.size() != 0) {
 			result.indices.clear();
@@ -925,22 +925,22 @@ public class HullLibrary {
 		result.indexCount = 0;
 		result.vertices = null;
 	}
-	
-	private static void addPoint(int[] vcount, ObjectArrayList<Vector3f> p, float x, float y, float z) {
+
+	private static void addPoint(int[] vcount, ObjectArrayList<Vector3d> p, double x, double y, double z) {
 		// XXX, might be broken
-		Vector3f dest = p.getQuick(vcount[0]);
+		Vector3d dest = p.getQuick(vcount[0]);
 		dest.x = x;
 		dest.y = y;
 		dest.z = z;
 		vcount[0]++;
 	}
-	
-	private static float getDist(float px, float py, float pz, Vector3f p2) {
-		float dx = px - p2.x;
-		float dy = py - p2.y;
-		float dz = pz - p2.z;
+
+	private static double getDist(double px, double py, double pz, Vector3d p2) {
+		double dx = px - p2.x;
+		double dy = py - p2.y;
+		double dz = pz - p2.z;
 
 		return dx*dx + dy*dy + dz*dz;
 	}
-	
+
 }

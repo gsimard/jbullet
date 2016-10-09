@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -31,30 +31,30 @@ import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.ContactSolverInfo;
 import com.bulletphysics.dynamics.constraintsolver.TypedConstraint;
 import com.bulletphysics.dynamics.vehicle.RaycastVehicle;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * DynamicsWorld is the interface class for several dynamics implementation,
  * basic, discrete, parallel, and continuous etc.
- * 
+ *
  * @author jezek2
  */
 public abstract class DynamicsWorld extends CollisionWorld {
 
 	protected InternalTickCallback internalTickCallback;
 	protected Object worldUserInfo;
-	
+
 	protected final ContactSolverInfo solverInfo = new ContactSolverInfo();
-	
+
 	public DynamicsWorld(Dispatcher dispatcher, BroadphaseInterface broadphasePairCache, CollisionConfiguration collisionConfiguration) {
 		super(dispatcher, broadphasePairCache, collisionConfiguration);
 	}
 
-	public final int stepSimulation(float timeStep) {
+	public final int stepSimulation(double timeStep) {
 		return stepSimulation(timeStep, 1, 1f / 60f);
 	}
 
-	public final int stepSimulation(float timeStep, int maxSubSteps) {
+	public final int stepSimulation(double timeStep, int maxSubSteps) {
 		return stepSimulation(timeStep, maxSubSteps, 1f / 60f);
 	}
 
@@ -66,19 +66,19 @@ public abstract class DynamicsWorld extends CollisionWorld {
 	 *
 	 * In order to keep the simulation real-time, the maximum number of substeps can
 	 * be clamped to 'maxSubSteps'.<p>
-	 * 
+	 *
 	 * You can disable subdividing the timestep/substepping by passing maxSubSteps=0
 	 * as second argument to stepSimulation, but in that case you have to keep the
 	 * timeStep constant.
 	 */
-	public abstract int stepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep);
+	public abstract int stepSimulation(double timeStep, int maxSubSteps, double fixedTimeStep);
 
 	public abstract void debugDrawWorld();
 
 	public final void addConstraint(TypedConstraint constraint) {
 		addConstraint(constraint, false);
 	}
-	
+
 	public void addConstraint(TypedConstraint constraint, boolean disableCollisionsBetweenLinkedBodies) {
 	}
 
@@ -101,9 +101,9 @@ public abstract class DynamicsWorld extends CollisionWorld {
 	 * Once a rigidbody is added to the dynamics world, it will get this gravity assigned.
 	 * Existing rigidbodies in the world get gravity assigned too, during this method.
 	 */
-	public abstract void setGravity(Vector3f gravity);
-	
-	public abstract Vector3f getGravity(Vector3f out);
+	public abstract void setGravity(Vector3d gravity);
+
+	public abstract Vector3d getGravity(Vector3d out);
 
 	public abstract void addRigidBody(RigidBody body);
 
@@ -134,7 +134,7 @@ public abstract class DynamicsWorld extends CollisionWorld {
 	public abstract DynamicsWorldType getWorldType();
 
 	public abstract void clearForces();
-	
+
 	/**
 	 * Set the callback for when an internal tick (simulation substep) happens, optional user info.
 	 */
@@ -154,5 +154,5 @@ public abstract class DynamicsWorld extends CollisionWorld {
 	public ContactSolverInfo getSolverInfo() {
 		return solverInfo;
 	}
-	
+
 }

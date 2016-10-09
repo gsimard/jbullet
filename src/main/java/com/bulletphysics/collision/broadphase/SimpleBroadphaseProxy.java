@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -23,7 +23,7 @@
 
 package com.bulletphysics.collision.broadphase;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -31,16 +31,16 @@ import javax.vecmath.Vector3f;
  */
 class SimpleBroadphaseProxy extends BroadphaseProxy {
 
-	protected final Vector3f min = new Vector3f();
-	protected final Vector3f max = new Vector3f();
-	
+	protected final Vector3d min = new Vector3d();
+	protected final Vector3d max = new Vector3d();
+
 	public SimpleBroadphaseProxy() {
 	}
 
-	public SimpleBroadphaseProxy(Vector3f minpt, Vector3f maxpt, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Object multiSapProxy) {
+	public SimpleBroadphaseProxy(Vector3d minpt, Vector3d maxpt, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Object multiSapProxy) {
 		super(userPtr, collisionFilterGroup, collisionFilterMask, multiSapProxy);
 		this.min.set(minpt);
 		this.max.set(maxpt);
 	}
-	
+
 }

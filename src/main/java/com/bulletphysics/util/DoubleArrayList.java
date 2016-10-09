@@ -21,45 +21,51 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package com.bulletphysics.dynamics.constraintsolver;
+package com.bulletphysics.util;
 
 /**
- * Current state of contact solver.
  *
  * @author jezek2
  */
-public class ContactSolverInfo {
+public class DoubleArrayList {
 
-	public double tau = 0.6f;
-	public double damping = 1f;
-	public double friction = 0.3f;
-	public double timeStep;
-	public double restitution = 0f;
-	public int numIterations = 10;
-	public double maxErrorReduction = 20f;
-	public double sor = 1.3f;
-	public double erp = 0.2f; // used as Baumgarte factor
-	public double erp2 = 0.1f; // used in Split Impulse
-	public boolean splitImpulse = false;
-	public double splitImpulsePenetrationThreshold = -0.02f;
-	public double linearSlop = 0f;
-	public double warmstartingFactor = 0.85f;
+	private double[] array = new double[16];
+	private int size;
 
-	public int solverMode = SolverMode.SOLVER_RANDMIZE_ORDER | SolverMode.SOLVER_CACHE_FRIENDLY | SolverMode.SOLVER_USE_WARMSTARTING;
+	public void add(double value) {
+		if (size == array.length) {
+			expand();
+		}
 
-	public ContactSolverInfo() {
+		array[size++] = value;
 	}
 
-	public ContactSolverInfo(ContactSolverInfo g) {
-		tau = g.tau;
-		damping = g.damping;
-		friction = g.friction;
-		timeStep = g.timeStep;
-		restitution = g.restitution;
-		numIterations = g.numIterations;
-		maxErrorReduction = g.maxErrorReduction;
-		sor = g.sor;
-		erp = g.erp;
+	private void expand() {
+		double[] newArray = new double[array.length << 1];
+		System.arraycopy(array, 0, newArray, 0, array.length);
+		array = newArray;
+	}
+
+	public double remove(int index) {
+		if (index >= size) throw new IndexOutOfBoundsException();
+		double old = array[index];
+		System.arraycopy(array, index+1, array, index, size - index - 1);
+		size--;
+		return old;
+	}
+
+	public double get(int index) {
+		if (index >= size) throw new IndexOutOfBoundsException();
+		return array[index];
+	}
+
+	public void set(int index, double value) {
+		if (index >= size) throw new IndexOutOfBoundsException();
+		array[index] = value;
+	}
+
+	public int size() {
+		return size;
 	}
 
 }

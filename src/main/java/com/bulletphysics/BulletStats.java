@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -25,36 +25,36 @@ package com.bulletphysics;
 
 import com.bulletphysics.linearmath.CProfileManager;
 import com.bulletphysics.linearmath.Clock;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * Bullet statistics and profile support.
- * 
+ *
  * @author jezek2
  */
 public class BulletStats {
-	
+
 	public static int gTotalContactPoints;
-	
+
 	// GjkPairDetector
 	// temp globals, to improve GJK/EPA/penetration calculations
 	public static int gNumDeepPenetrationChecks = 0;
 	public static int gNumGjkChecks = 0;
 	public static int gNumSplitImpulseRecoveries = 0;
-	
+
 	public static int gNumAlignedAllocs;
 	public static int gNumAlignedFree;
-	public static int gTotalBytesAlignedAllocs;	
-	
+	public static int gTotalBytesAlignedAllocs;
+
 	public static int gPickingConstraintId = 0;
-	public static final Vector3f gOldPickingPos = new Vector3f();
-	public static float gOldPickingDist = 0.f;
-	
+	public static final Vector3d gOldPickingPos = new Vector3d();
+	public static double gOldPickingDist = 0.f;
+
 	public static int gOverlappingPairs = 0;
 	public static int gRemovePairs = 0;
 	public static int gAddedPairs = 0;
 	public static int gFindPairs = 0;
-	
+
 	public static final Clock gProfileClock = new Clock();
 
 	// DiscreteDynamicsWorld:
@@ -63,11 +63,11 @@ public class BulletStats {
 	// JAVA NOTE: added for statistics in applet demo
 	public static long stepSimulationTime;
 	public static long updateTime;
-	
+
 	private static boolean enableProfile = false;
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	public static boolean isProfileEnabled() {
 		return enableProfile;
 	}
@@ -75,20 +75,20 @@ public class BulletStats {
 	public static void setProfileEnabled(boolean b) {
 		enableProfile = b;
 	}
-	
+
 	public static long profileGetTicks() {
 		long ticks = gProfileClock.getTimeMicroseconds();
 		return ticks;
 	}
 
-	public static float profileGetTickRate() {
+	public static double profileGetTickRate() {
 		//return 1000000f;
 		return 1000f;
 	}
-	
+
 	/**
 	 * Pushes profile node. Use try/finally block to call {@link #popProfile} method.
-	 * 
+	 *
 	 * @param name must be {@link String#intern interned} String (not needed for String literals)
 	 */
 	public static void pushProfile(String name) {
@@ -96,7 +96,7 @@ public class BulletStats {
 			CProfileManager.startProfile(name);
 		}
 	}
-	
+
 	/**
 	 * Pops profile node.
 	 */
@@ -105,5 +105,5 @@ public class BulletStats {
 			CProfileManager.stopProfile();
 		}
 	}
-	
+
 }

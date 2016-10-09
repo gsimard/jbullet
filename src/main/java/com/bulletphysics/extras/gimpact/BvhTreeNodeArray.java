@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -36,8 +36,8 @@ import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
 class BvhTreeNodeArray {
 
 	private int size = 0;
-	
-	private float[] bound = new float[0];
+
+	private double[] bound = new double[0];
 	private int[] escapeIndexOrDataIndex = new int[0];
 
 	public void clear() {
@@ -45,22 +45,22 @@ class BvhTreeNodeArray {
 	}
 
 	public void resize(int newSize) {
-		float[] newBound = new float[newSize*6];
+		double[] newBound = new double[newSize*6];
 		int[] newEIODI = new int[newSize];
-		
+
 		System.arraycopy(bound, 0, newBound, 0, size*6);
 		System.arraycopy(escapeIndexOrDataIndex, 0, newEIODI, 0, size);
-		
+
 		bound = newBound;
 		escapeIndexOrDataIndex = newEIODI;
-		
+
 		size = newSize;
 	}
-	
+
 	public void set(int destIdx, BvhTreeNodeArray array, int srcIdx) {
 		int dpos = destIdx*6;
 		int spos = srcIdx*6;
-		
+
 		bound[dpos+0] = array.bound[spos+0];
 		bound[dpos+1] = array.bound[spos+1];
 		bound[dpos+2] = array.bound[spos+2];
@@ -73,7 +73,7 @@ class BvhTreeNodeArray {
 	public void set(int destIdx, BvhDataArray array, int srcIdx) {
 		int dpos = destIdx*6;
 		int spos = srcIdx*6;
-		
+
 		bound[dpos+0] = array.bound[spos+0];
 		bound[dpos+1] = array.bound[spos+1];
 		bound[dpos+2] = array.bound[spos+2];
@@ -82,14 +82,14 @@ class BvhTreeNodeArray {
 		bound[dpos+5] = array.bound[spos+5];
 		escapeIndexOrDataIndex[destIdx] = array.data[srcIdx];
 	}
-	
+
 	public AABB getBound(int nodeIndex, AABB out) {
 		int pos = nodeIndex*6;
 		out.min.set(bound[pos+0], bound[pos+1], bound[pos+2]);
 		out.max.set(bound[pos+3], bound[pos+4], bound[pos+5]);
 		return out;
 	}
-	
+
 	public void setBound(int nodeIndex, AABB aabb) {
 		int pos = nodeIndex*6;
 		bound[pos+0] = aabb.min.x;
@@ -99,7 +99,7 @@ class BvhTreeNodeArray {
 		bound[pos+4] = aabb.max.y;
 		bound[pos+5] = aabb.max.z;
 	}
-	
+
 	public boolean isLeafNode(int nodeIndex) {
 		// skipindex is negative (internal node), triangleindex >=0 (leafnode)
 		return (escapeIndexOrDataIndex[nodeIndex] >= 0);
@@ -122,5 +122,5 @@ class BvhTreeNodeArray {
 	public void setDataIndex(int nodeIndex, int index) {
 		escapeIndexOrDataIndex[nodeIndex] = index;
 	}
-	
+
 }

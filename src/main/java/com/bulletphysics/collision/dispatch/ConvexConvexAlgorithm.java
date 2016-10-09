@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -40,16 +40,16 @@ import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * ConvexConvexAlgorithm collision algorithm implements time of impact, convex
  * closest points and penetration depth calculations.
- * 
+ *
  * @author jezek2
  */
 public class ConvexConvexAlgorithm extends CollisionAlgorithm {
-	
+
 	protected final ObjectPool<ClosestPointInput> pointInputsPool = ObjectPool.get(ClosestPointInput.class);
 
 	private GjkPairDetector gjkPairDetector = new GjkPairDetector();
@@ -57,7 +57,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 	public boolean ownManifold;
 	public PersistentManifold manifoldPtr;
 	public boolean lowLevelOfDetail;
-	
+
 	public void init(PersistentManifold mf, CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1, SimplexSolverInterface simplexSolver, ConvexPenetrationDepthSolver pdSolver) {
 		super.init(ci);
 		gjkPairDetector.init(null, null, simplexSolver, pdSolver);
@@ -65,7 +65,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		this.ownManifold = false;
 		this.lowLevelOfDetail = false;
 	}
-	
+
 	@Override
 	public void destroy() {
 		if (ownManifold) {
@@ -125,7 +125,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		body1.getWorldTransform(input.transformB);
 
 		gjkPairDetector.getClosestPoints(input, resultOut, dispatchInfo.debugDraw);
-		
+
 		pointInputsPool.release(input);
 		//	#endif
 
@@ -135,11 +135,11 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 	}
 
 	private static boolean disableCcd = false;
-	
+
 	@Override
-	public float calculateTimeOfImpact(CollisionObject col0, CollisionObject col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		
+	public double calculateTimeOfImpact(CollisionObject col0, CollisionObject col1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+
 		Transform tmpTrans1 = Stack.alloc(Transform.class);
 		Transform tmpTrans2 = Stack.alloc(Transform.class);
 
@@ -147,13 +147,13 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 
 		// Linear motion for one of objects needs to exceed m_ccdSquareMotionThreshold
 		// col0->m_worldTransform,
-		float resultFraction = 1f;
+		double resultFraction = 1f;
 
 		tmp.sub(col0.getInterpolationWorldTransform(tmpTrans1).origin, col0.getWorldTransform(tmpTrans2).origin);
-		float squareMot0 = tmp.lengthSquared();
+		double squareMot0 = tmp.lengthSquared();
 
 		tmp.sub(col1.getInterpolationWorldTransform(tmpTrans1).origin, col1.getWorldTransform(tmpTrans2).origin);
-		float squareMot1 = tmp.lengthSquared();
+		double squareMot1 = tmp.lengthSquared();
 
 		if (squareMot0 < col0.getCcdSquareMotionThreshold() &&
 				squareMot1 < col1.getCcdSquareMotionThreshold()) {
@@ -163,7 +163,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		if (disableCcd) {
 			return 1f;
 		}
-		
+
 		Transform tmpTrans3 = Stack.alloc(Transform.class);
 		Transform tmpTrans4 = Stack.alloc(Transform.class);
 
@@ -242,13 +242,13 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 			manifoldArray.add(manifoldPtr);
 		}
 	}
-	
+
 	public PersistentManifold getManifold() {
 		return manifoldPtr;
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	public static class CreateFunc extends CollisionAlgorithmCreateFunc {
 		private final ObjectPool<ConvexConvexAlgorithm> pool = ObjectPool.get(ConvexConvexAlgorithm.class);
 
@@ -272,5 +272,5 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 			pool.release((ConvexConvexAlgorithm)algo);
 		}
 	}
-	
+
 }

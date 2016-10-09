@@ -29,7 +29,7 @@ import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -37,8 +37,8 @@ import javax.vecmath.Vector3f;
  */
 public class DbvtAabbMm {
 
-	private final Vector3f mi = new Vector3f();
-	private final Vector3f mx = new Vector3f();
+	private final Vector3d mi = new Vector3d();
+	private final Vector3d mx = new Vector3d();
 
 	public DbvtAabbMm() {
 	}
@@ -46,15 +46,15 @@ public class DbvtAabbMm {
 	public DbvtAabbMm(DbvtAabbMm o) {
 		set(o);
 	}
-	
+
 	public void set(DbvtAabbMm o) {
 		mi.set(o.mi);
 		mx.set(o.mx);
 	}
-	
+
 	public static void swap(DbvtAabbMm p1, DbvtAabbMm p2) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+
 		tmp.set(p1.mi);
 		p1.mi.set(p2.mi);
 		p2.mi.set(tmp);
@@ -64,74 +64,74 @@ public class DbvtAabbMm {
 		p2.mx.set(tmp);
 	}
 
-	public Vector3f Center(Vector3f out) {
+	public Vector3d Center(Vector3d out) {
 		out.add(mi, mx);
 		out.scale(0.5f);
 		return out;
 	}
-	
-	public Vector3f Lengths(Vector3f out) {
+
+	public Vector3d Lengths(Vector3d out) {
 		out.sub(mx, mi);
 		return out;
 	}
-	
-	public Vector3f Extents(Vector3f out) {
+
+	public Vector3d Extents(Vector3d out) {
 		out.sub(mx, mi);
 		out.scale(0.5f);
 		return out;
 	}
-	
-	public Vector3f Mins() {
+
+	public Vector3d Mins() {
 		return mi;
 	}
 
-	public Vector3f Maxs() {
+	public Vector3d Maxs() {
 		return mx;
 	}
-	
-	public static DbvtAabbMm FromCE(Vector3f c, Vector3f e, DbvtAabbMm out) {
+
+	public static DbvtAabbMm FromCE(Vector3d c, Vector3d e, DbvtAabbMm out) {
 		DbvtAabbMm box = out;
 		box.mi.sub(c, e);
 		box.mx.add(c, e);
 		return box;
 	}
 
-	public static DbvtAabbMm FromCR(Vector3f c, float r, DbvtAabbMm out) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+	public static DbvtAabbMm FromCR(Vector3d c, double r, DbvtAabbMm out) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		tmp.set(r, r, r);
 		return FromCE(c, tmp, out);
 	}
 
-	public static DbvtAabbMm FromMM(Vector3f mi, Vector3f mx, DbvtAabbMm out) {
+	public static DbvtAabbMm FromMM(Vector3d mi, Vector3d mx, DbvtAabbMm out) {
 		DbvtAabbMm box = out;
 		box.mi.set(mi);
 		box.mx.set(mx);
 		return box;
 	}
-	
+
 	//public static  DbvtAabbMm	FromPoints( btVector3* pts,int n);
 	//public static  DbvtAabbMm	FromPoints( btVector3** ppts,int n);
-	
-	public void Expand(Vector3f e) {
+
+	public void Expand(Vector3d e) {
 		mi.sub(e);
 		mx.add(e);
 	}
 
-	public void SignedExpand(Vector3f e) {
+	public void SignedExpand(Vector3d e) {
 		if (e.x > 0) {
 			mx.x += e.x;
 		}
 		else {
 			mi.x += e.x;
 		}
-		
+
 		if (e.y > 0) {
 			mx.y += e.y;
 		}
 		else {
 			mi.y += e.y;
 		}
-		
+
 		if (e.z > 0) {
 			mx.z += e.z;
 		}
@@ -149,9 +149,9 @@ public class DbvtAabbMm {
 		        (mx.z >= a.mx.z));
 	}
 
-	public int Classify(Vector3f n, float o, int s) {
-		Vector3f pi = Stack.alloc(Vector3f.class);
-		Vector3f px = Stack.alloc(Vector3f.class);
+	public int Classify(Vector3d n, double o, int s) {
+		Vector3d pi = Stack.alloc(Vector3d.class);
+		Vector3d px = Stack.alloc(Vector3d.class);
 
 		switch (s) {
 			case (0 + 0 + 0):
@@ -187,7 +187,7 @@ public class DbvtAabbMm {
 				pi.set(mi.x, mi.y, mi.z);
 				break;
 		}
-		
+
 		if ((n.dot(px) + o) < 0) {
 			return -1;
 		}
@@ -197,15 +197,15 @@ public class DbvtAabbMm {
 		return 0;
 	}
 
-	public float ProjectMinimum(Vector3f v, int signs) {
-		Vector3f[] b = new Vector3f[] { mx, mi };
-		Vector3f p = Stack.alloc(Vector3f.class);
+	public double ProjectMinimum(Vector3d v, int signs) {
+		Vector3d[] b = new Vector3d[] { mx, mi };
+		Vector3d p = Stack.alloc(Vector3d.class);
 		p.set(b[(signs >> 0) & 1].x,
 		      b[(signs >> 1) & 1].y,
 		      b[(signs >> 2) & 1].z);
 		return p.dot(v);
 	}
-	 
+
 	public static boolean Intersect(DbvtAabbMm a, DbvtAabbMm b) {
 		return ((a.mi.x <= b.mx.x) &&
 		        (a.mx.x >= b.mi.x) &&
@@ -216,9 +216,9 @@ public class DbvtAabbMm {
 	}
 
 	public static boolean Intersect(DbvtAabbMm a, DbvtAabbMm b, Transform xform) {
-		Vector3f d0 = Stack.alloc(Vector3f.class);
-		Vector3f d1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+		Vector3d d0 = Stack.alloc(Vector3d.class);
+		Vector3d d1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 
 		// JAVA NOTE: check
 		b.Center(d0);
@@ -227,8 +227,8 @@ public class DbvtAabbMm {
 
 		MatrixUtil.transposeTransform(d1, d0, xform.basis);
 
-		float[] s0 = new float[] { 0, 0 };
-		float[] s1 = new float[2];
+		double[] s0 = new double[] { 0, 0 };
+		double[] s1 = new double[2];
 		s1[0] = xform.origin.dot(d0);
 		s1[1] = s1[0];
 
@@ -243,7 +243,7 @@ public class DbvtAabbMm {
 		return true;
 	}
 
-	public static boolean Intersect(DbvtAabbMm a, Vector3f b) {
+	public static boolean Intersect(DbvtAabbMm a, Vector3d b) {
 		return ((b.x >= a.mi.x) &&
 		        (b.y >= a.mi.y) &&
 		        (b.z >= a.mi.z) &&
@@ -252,28 +252,28 @@ public class DbvtAabbMm {
 		        (b.z <= a.mx.z));
 	}
 
-	public static boolean Intersect(DbvtAabbMm a, Vector3f org, Vector3f invdir, int[] signs) {
-		Vector3f[] bounds = new Vector3f[]{a.mi, a.mx};
-		float txmin = (bounds[signs[0]].x - org.x) * invdir.x;
-		float txmax = (bounds[1 - signs[0]].x - org.x) * invdir.x;
-		float tymin = (bounds[signs[1]].y - org.y) * invdir.y;
-		float tymax = (bounds[1 - signs[1]].y - org.y) * invdir.y;
+	public static boolean Intersect(DbvtAabbMm a, Vector3d org, Vector3d invdir, int[] signs) {
+		Vector3d[] bounds = new Vector3d[]{a.mi, a.mx};
+		double txmin = (bounds[signs[0]].x - org.x) * invdir.x;
+		double txmax = (bounds[1 - signs[0]].x - org.x) * invdir.x;
+		double tymin = (bounds[signs[1]].y - org.y) * invdir.y;
+		double tymax = (bounds[1 - signs[1]].y - org.y) * invdir.y;
 		if ((txmin > tymax) || (tymin > txmax)) {
 			return false;
 		}
-		
+
 		if (tymin > txmin) {
 			txmin = tymin;
 		}
 		if (tymax < txmax) {
 			txmax = tymax;
 		}
-		float tzmin = (bounds[signs[2]].z - org.z) * invdir.z;
-		float tzmax = (bounds[1 - signs[2]].z - org.z) * invdir.z;
+		double tzmin = (bounds[signs[2]].z - org.z) * invdir.z;
+		double tzmax = (bounds[1 - signs[2]].z - org.z) * invdir.z;
 		if ((txmin > tzmax) || (tzmin > txmax)) {
 			return false;
 		}
-		
+
 		if (tzmin > txmin) {
 			txmin = tzmin;
 		}
@@ -283,9 +283,9 @@ public class DbvtAabbMm {
 		return (txmax > 0);
 	}
 
-	public static float Proximity(DbvtAabbMm a, DbvtAabbMm b) {
-		Vector3f d = Stack.alloc(Vector3f.class);
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+	public static double Proximity(DbvtAabbMm a, DbvtAabbMm b) {
+		Vector3d d = Stack.alloc(Vector3d.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 
 		d.add(a.mi, a.mx);
 		tmp.add(b.mi, b.mx);
@@ -301,7 +301,7 @@ public class DbvtAabbMm {
 			else {
 				VectorUtil.setCoord(r.mi, i, VectorUtil.getCoord(b.mi, i));
 			}
-			
+
 			if (VectorUtil.getCoord(a.mx, i) > VectorUtil.getCoord(b.mx, i)) {
 				VectorUtil.setCoord(r.mx, i, VectorUtil.getCoord(a.mx, i));
 			}
@@ -319,8 +319,8 @@ public class DbvtAabbMm {
 		        (a.mx.y != b.mx.y) ||
 		        (a.mx.z != b.mx.z));
 	}
-	
-	private void AddSpan(Vector3f d, float[] smi, int smi_idx, float[] smx, int smx_idx) {
+
+	private void AddSpan(Vector3d d, double[] smi, int smi_idx, double[] smx, int smx_idx) {
 		for (int i=0; i<3; i++) {
 			if (VectorUtil.getCoord(d, i) < 0) {
 				smi[smi_idx] += VectorUtil.getCoord(mx, i) * VectorUtil.getCoord(d, i);
@@ -332,5 +332,5 @@ public class DbvtAabbMm {
 			}
 		}
 	}
-	
+
 }

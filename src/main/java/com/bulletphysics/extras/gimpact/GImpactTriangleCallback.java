@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -29,7 +29,7 @@ package com.bulletphysics.extras.gimpact;
 
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.shapes.TriangleCallback;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -42,9 +42,9 @@ class GImpactTriangleCallback extends TriangleCallback {
 	public CollisionObject body1;
 	public GImpactShapeInterface gimpactshape0;
 	public boolean swapped;
-	public float margin;
-	
-	public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+	public double margin;
+
+	public void processTriangle(Vector3d[] triangle, int partId, int triangleIndex) {
 		TriangleShapeEx tri1 = new TriangleShapeEx(triangle[0], triangle[1], triangle[2]);
 		tri1.setMargin(margin);
 		if (swapped) {

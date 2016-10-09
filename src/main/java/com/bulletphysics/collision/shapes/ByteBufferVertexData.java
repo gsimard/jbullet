@@ -24,7 +24,7 @@
 package com.bulletphysics.collision.shapes;
 
 import java.nio.ByteBuffer;
-import javax.vecmath.Tuple3f;
+import javax.vecmath.Tuple3d;
 
 /**
  *
@@ -53,20 +53,20 @@ public class ByteBufferVertexData extends VertexData {
 	}
 
 	@Override
-	public <T extends Tuple3f> T getVertex(int idx, T out) {
+	public <T extends Tuple3d> T getVertex(int idx, T out) {
 		int off = idx*vertexStride;
-		out.x = vertexData.getFloat(off+4*0);
-		out.y = vertexData.getFloat(off+4*1);
-		out.z = vertexData.getFloat(off+4*2);
+		out.x = vertexData.getDouble(off+4*0);
+		out.y = vertexData.getDouble(off+4*1);
+		out.z = vertexData.getDouble(off+4*2);
 		return out;
 	}
 
 	@Override
-	public void setVertex(int idx, float x, float y, float z) {
+	public void setVertex(int idx, double x, double y, double z) {
 		int off = idx*vertexStride;
-		vertexData.putFloat(off+4*0, x);
-		vertexData.putFloat(off+4*1, y);
-		vertexData.putFloat(off+4*2, z);
+		vertexData.putDouble(off+4*0, x);
+		vertexData.putDouble(off+4*1, y);
+		vertexData.putDouble(off+4*2, z);
 	}
 
 	@Override

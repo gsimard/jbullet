@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -19,7 +19,7 @@
  * 2. Altered source versions must be plainly marked as such, and must not be
  *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
- * 
+ *
  * Written by: Marcus Hennix
  */
 
@@ -32,13 +32,13 @@ import com.bulletphysics.linearmath.ScalarUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.TransformUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Vector3d;
 
 /**
  * ConeTwistConstraint can be used to simulate ragdoll joints (upper arm, leg etc).
- * 
+ *
  * @author jezek2
  */
 public class ConeTwistConstraint extends TypedConstraint {
@@ -48,31 +48,31 @@ public class ConeTwistConstraint extends TypedConstraint {
 	private final Transform rbAFrame = new Transform();
 	private final Transform rbBFrame = new Transform();
 
-	private float limitSoftness;
-	private float biasFactor;
-	private float relaxationFactor;
+	private double limitSoftness;
+	private double biasFactor;
+	private double relaxationFactor;
 
-	private float swingSpan1;
-	private float swingSpan2;
-	private float twistSpan;
+	private double swingSpan1;
+	private double swingSpan2;
+	private double twistSpan;
 
-	private final Vector3f swingAxis = new Vector3f();
-	private final Vector3f twistAxis = new Vector3f();
+	private final Vector3d swingAxis = new Vector3d();
+	private final Vector3d twistAxis = new Vector3d();
 
-	private float kSwing;
-	private float kTwist;
+	private double kSwing;
+	private double kTwist;
 
-	private float twistLimitSign;
-	private float swingCorrection;
-	private float twistCorrection;
+	private double twistLimitSign;
+	private double swingCorrection;
+	private double twistCorrection;
 
-	private float accSwingLimitImpulse;
-	private float accTwistLimitImpulse;
+	private double accSwingLimitImpulse;
+	private double accTwistLimitImpulse;
 
 	private boolean angularOnly = false;
 	private boolean solveTwistLimit;
 	private boolean solveSwingLimit;
-	
+
 	public ConeTwistConstraint() {
 		super(TypedConstraintType.CONETWIST_CONSTRAINT_TYPE);
 	}
@@ -106,12 +106,12 @@ public class ConeTwistConstraint extends TypedConstraint {
 		solveTwistLimit = false;
 		solveSwingLimit = false;
 	}
-	
+
 	@Override
 	public void buildJacobian() {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
 		Transform tmpTrans = Stack.alloc(Transform.class);
 
@@ -126,17 +126,17 @@ public class ConeTwistConstraint extends TypedConstraint {
 		accSwingLimitImpulse = 0f;
 
 		if (!angularOnly) {
-			Vector3f pivotAInW = Stack.alloc(rbAFrame.origin);
+			Vector3d pivotAInW = Stack.alloc(rbAFrame.origin);
 			rbA.getCenterOfMassTransform(tmpTrans).transform(pivotAInW);
 
-			Vector3f pivotBInW = Stack.alloc(rbBFrame.origin);
+			Vector3d pivotBInW = Stack.alloc(rbBFrame.origin);
 			rbB.getCenterOfMassTransform(tmpTrans).transform(pivotBInW);
 
-			Vector3f relPos = Stack.alloc(Vector3f.class);
+			Vector3d relPos = Stack.alloc(Vector3d.class);
 			relPos.sub(pivotBInW, pivotAInW);
 
 			// TODO: stack
-			Vector3f[] normal/*[3]*/ = new Vector3f[]{Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class), Stack.alloc(Vector3f.class)};
+			Vector3d[] normal/*[3]*/ = new Vector3d[]{Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class), Stack.alloc(Vector3d.class)};
 			if (relPos.lengthSquared() > BulletGlobals.FLT_EPSILON) {
 				normal[0].normalize(relPos);
 			}
@@ -147,10 +147,10 @@ public class ConeTwistConstraint extends TypedConstraint {
 			TransformUtil.planeSpace1(normal[0], normal[1], normal[2]);
 
 			for (int i = 0; i < 3; i++) {
-				Matrix3f mat1 = rbA.getCenterOfMassTransform(Stack.alloc(Transform.class)).basis;
+				Matrix3d mat1 = rbA.getCenterOfMassTransform(Stack.alloc(Transform.class)).basis;
 				mat1.transpose();
 
-				Matrix3f mat2 = rbB.getCenterOfMassTransform(Stack.alloc(Transform.class)).basis;
+				Matrix3d mat2 = rbB.getCenterOfMassTransform(Stack.alloc(Transform.class)).basis;
 				mat2.transpose();
 
 				tmp1.sub(pivotAInW, rbA.getCenterOfMassPosition(tmp));
@@ -162,15 +162,15 @@ public class ConeTwistConstraint extends TypedConstraint {
 						tmp1,
 						tmp2,
 						normal[i],
-						rbA.getInvInertiaDiagLocal(Stack.alloc(Vector3f.class)),
+						rbA.getInvInertiaDiagLocal(Stack.alloc(Vector3d.class)),
 						rbA.getInvMass(),
-						rbB.getInvInertiaDiagLocal(Stack.alloc(Vector3f.class)),
+						rbB.getInvInertiaDiagLocal(Stack.alloc(Vector3d.class)),
 						rbB.getInvMass());
 			}
 		}
 
-		Vector3f b1Axis1 = Stack.alloc(Vector3f.class), b1Axis2 = Stack.alloc(Vector3f.class), b1Axis3 = Stack.alloc(Vector3f.class);
-		Vector3f b2Axis1 = Stack.alloc(Vector3f.class), b2Axis2 = Stack.alloc(Vector3f.class);
+		Vector3d b1Axis1 = Stack.alloc(Vector3d.class), b1Axis2 = Stack.alloc(Vector3d.class), b1Axis3 = Stack.alloc(Vector3d.class);
+		Vector3d b2Axis1 = Stack.alloc(Vector3d.class), b2Axis2 = Stack.alloc(Vector3d.class);
 
 		rbAFrame.basis.getColumn(0, b1Axis1);
 		getRigidBodyA().getCenterOfMassTransform(tmpTrans).basis.transform(b1Axis1);
@@ -178,11 +178,11 @@ public class ConeTwistConstraint extends TypedConstraint {
 		rbBFrame.basis.getColumn(0, b2Axis1);
 		getRigidBodyB().getCenterOfMassTransform(tmpTrans).basis.transform(b2Axis1);
 
-		float swing1 = 0f, swing2 = 0f;
+		double swing1 = 0f, swing2 = 0f;
 
-		float swx = 0f, swy = 0f;
-		float thresh = 10f;
-		float fact;
+		double swx = 0f, swy = 0f;
+		double thresh = 10f;
+		double fact;
 
 		// Get Frame into world space
 		if (swingSpan1 >= 0.05f) {
@@ -209,9 +209,9 @@ public class ConeTwistConstraint extends TypedConstraint {
 			swing2 *= fact;
 		}
 
-		float RMaxAngle1Sq = 1.0f / (swingSpan1 * swingSpan1);
-		float RMaxAngle2Sq = 1.0f / (swingSpan2 * swingSpan2);
-		float EllipseAngle = Math.abs(swing1*swing1) * RMaxAngle1Sq + Math.abs(swing2*swing2) * RMaxAngle2Sq;
+		double RMaxAngle1Sq = 1.0f / (swingSpan1 * swingSpan1);
+		double RMaxAngle2Sq = 1.0f / (swingSpan2 * swingSpan2);
+		double EllipseAngle = Math.abs(swing1*swing1) * RMaxAngle1Sq + Math.abs(swing2*swing2) * RMaxAngle2Sq;
 
 		if (EllipseAngle > 1.0f) {
 			swingCorrection = EllipseAngle - 1.0f;
@@ -224,7 +224,7 @@ public class ConeTwistConstraint extends TypedConstraint {
 			swingAxis.cross(b2Axis1, tmp);
 			swingAxis.normalize();
 
-			float swingAxisSign = (b2Axis1.dot(b1Axis1) >= 0.0f) ? 1.0f : -1.0f;
+			double swingAxisSign = (b2Axis1.dot(b1Axis1) >= 0.0f) ? 1.0f : -1.0f;
 			swingAxis.scale(swingAxisSign);
 
 			kSwing = 1f / (getRigidBodyA().computeAngularImpulseDenominator(swingAxis) +
@@ -234,15 +234,15 @@ public class ConeTwistConstraint extends TypedConstraint {
 
 		// Twist limits
 		if (twistSpan >= 0f) {
-			//Vector3f b2Axis2 = Stack.alloc(Vector3f.class);
+			//Vector3d b2Axis2 = Stack.alloc(Vector3d.class);
 			rbBFrame.basis.getColumn(1, b2Axis2);
 			getRigidBodyB().getCenterOfMassTransform(tmpTrans).basis.transform(b2Axis2);
 
-			Quat4f rotationArc = QuaternionUtil.shortestArcQuat(b2Axis1, b1Axis1, Stack.alloc(Quat4f.class));
-			Vector3f TwistRef = QuaternionUtil.quatRotate(rotationArc, b2Axis2, Stack.alloc(Vector3f.class));
-			float twist = ScalarUtil.atan2Fast(TwistRef.dot(b1Axis3), TwistRef.dot(b1Axis2));
+			Quat4d rotationArc = QuaternionUtil.shortestArcQuat(b2Axis1, b1Axis1, Stack.alloc(Quat4d.class));
+			Vector3d TwistRef = QuaternionUtil.quatRotate(rotationArc, b2Axis2, Stack.alloc(Vector3d.class));
+			double twist = ScalarUtil.atan2Fast(TwistRef.dot(b1Axis3), TwistRef.dot(b1Axis2));
 
-			float lockedFreeFactor = (twistSpan > 0.05f) ? limitSoftness : 0f;
+			double lockedFreeFactor = (twistSpan > 0.05f) ? limitSoftness : 0f;
 			if (twist <= -twistSpan * lockedFreeFactor) {
 				twistCorrection = -(twist + twistSpan);
 				solveTwistLimit = true;
@@ -271,46 +271,46 @@ public class ConeTwistConstraint extends TypedConstraint {
 	}
 
 	@Override
-	public void solveConstraint(float timeStep) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+	public void solveConstraint(double timeStep) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
-		Vector3f tmpVec = Stack.alloc(Vector3f.class);
+		Vector3d tmpVec = Stack.alloc(Vector3d.class);
 		Transform tmpTrans = Stack.alloc(Transform.class);
 
-		Vector3f pivotAInW = Stack.alloc(rbAFrame.origin);
+		Vector3d pivotAInW = Stack.alloc(rbAFrame.origin);
 		rbA.getCenterOfMassTransform(tmpTrans).transform(pivotAInW);
 
-		Vector3f pivotBInW = Stack.alloc(rbBFrame.origin);
+		Vector3d pivotBInW = Stack.alloc(rbBFrame.origin);
 		rbB.getCenterOfMassTransform(tmpTrans).transform(pivotBInW);
 
-		float tau = 0.3f;
+		double tau = 0.3f;
 
 		// linear part
 		if (!angularOnly) {
-			Vector3f rel_pos1 = Stack.alloc(Vector3f.class);
+			Vector3d rel_pos1 = Stack.alloc(Vector3d.class);
 			rel_pos1.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
 
-			Vector3f rel_pos2 = Stack.alloc(Vector3f.class);
+			Vector3d rel_pos2 = Stack.alloc(Vector3d.class);
 			rel_pos2.sub(pivotBInW, rbB.getCenterOfMassPosition(tmpVec));
 
-			Vector3f vel1 = rbA.getVelocityInLocalPoint(rel_pos1, Stack.alloc(Vector3f.class));
-			Vector3f vel2 = rbB.getVelocityInLocalPoint(rel_pos2, Stack.alloc(Vector3f.class));
-			Vector3f vel = Stack.alloc(Vector3f.class);
+			Vector3d vel1 = rbA.getVelocityInLocalPoint(rel_pos1, Stack.alloc(Vector3d.class));
+			Vector3d vel2 = rbB.getVelocityInLocalPoint(rel_pos2, Stack.alloc(Vector3d.class));
+			Vector3d vel = Stack.alloc(Vector3d.class);
 			vel.sub(vel1, vel2);
 
 			for (int i = 0; i < 3; i++) {
-				Vector3f normal = jac[i].linearJointAxis;
-				float jacDiagABInv = 1f / jac[i].getDiagonal();
+				Vector3d normal = jac[i].linearJointAxis;
+				double jacDiagABInv = 1f / jac[i].getDiagonal();
 
-				float rel_vel;
+				double rel_vel;
 				rel_vel = normal.dot(vel);
 				// positional error (zeroth order error)
 				tmp.sub(pivotAInW, pivotBInW);
-				float depth = -(tmp).dot(normal); // this is the error projected on the normal
-				float impulse = depth * tau / timeStep * jacDiagABInv - rel_vel * jacDiagABInv;
+				double depth = -(tmp).dot(normal); // this is the error projected on the normal
+				double impulse = depth * tau / timeStep * jacDiagABInv - rel_vel * jacDiagABInv;
 				appliedImpulse += impulse;
-				Vector3f impulse_vector = Stack.alloc(Vector3f.class);
+				Vector3d impulse_vector = Stack.alloc(Vector3d.class);
 				impulse_vector.scale(impulse, normal);
 
 				tmp.sub(pivotAInW, rbA.getCenterOfMassPosition(tmpVec));
@@ -324,21 +324,21 @@ public class ConeTwistConstraint extends TypedConstraint {
 
 		{
 			// solve angular part
-			Vector3f angVelA = getRigidBodyA().getAngularVelocity(Stack.alloc(Vector3f.class));
-			Vector3f angVelB = getRigidBodyB().getAngularVelocity(Stack.alloc(Vector3f.class));
+			Vector3d angVelA = getRigidBodyA().getAngularVelocity(Stack.alloc(Vector3d.class));
+			Vector3d angVelB = getRigidBodyB().getAngularVelocity(Stack.alloc(Vector3d.class));
 
 			// solve swing limit
 			if (solveSwingLimit) {
 				tmp.sub(angVelB, angVelA);
-				float amplitude = ((tmp).dot(swingAxis) * relaxationFactor * relaxationFactor + swingCorrection * (1f / timeStep) * biasFactor);
-				float impulseMag = amplitude * kSwing;
+				double amplitude = ((tmp).dot(swingAxis) * relaxationFactor * relaxationFactor + swingCorrection * (1f / timeStep) * biasFactor);
+				double impulseMag = amplitude * kSwing;
 
 				// Clamp the accumulated impulse
-				float temp = accSwingLimitImpulse;
+				double temp = accSwingLimitImpulse;
 				accSwingLimitImpulse = Math.max(accSwingLimitImpulse + impulseMag, 0.0f);
 				impulseMag = accSwingLimitImpulse - temp;
 
-				Vector3f impulse = Stack.alloc(Vector3f.class);
+				Vector3d impulse = Stack.alloc(Vector3d.class);
 				impulse.scale(impulseMag, swingAxis);
 
 				rbA.applyTorqueImpulse(impulse);
@@ -350,15 +350,15 @@ public class ConeTwistConstraint extends TypedConstraint {
 			// solve twist limit
 			if (solveTwistLimit) {
 				tmp.sub(angVelB, angVelA);
-				float amplitude = ((tmp).dot(twistAxis) * relaxationFactor * relaxationFactor + twistCorrection * (1f / timeStep) * biasFactor);
-				float impulseMag = amplitude * kTwist;
+				double amplitude = ((tmp).dot(twistAxis) * relaxationFactor * relaxationFactor + twistCorrection * (1f / timeStep) * biasFactor);
+				double impulseMag = amplitude * kTwist;
 
 				// Clamp the accumulated impulse
-				float temp = accTwistLimitImpulse;
+				double temp = accTwistLimitImpulse;
 				accTwistLimitImpulse = Math.max(accTwistLimitImpulse + impulseMag, 0.0f);
 				impulseMag = accTwistLimitImpulse - temp;
 
-				Vector3f impulse = Stack.alloc(Vector3f.class);
+				Vector3d impulse = Stack.alloc(Vector3d.class);
 				impulse.scale(impulseMag, twistAxis);
 
 				rbA.applyTorqueImpulse(impulse);
@@ -369,18 +369,18 @@ public class ConeTwistConstraint extends TypedConstraint {
 		}
 	}
 
-	public void updateRHS(float timeStep) {
+	public void updateRHS(double timeStep) {
 	}
 
 	public void setAngularOnly(boolean angularOnly) {
 		this.angularOnly = angularOnly;
 	}
 
-	public void setLimit(float _swingSpan1, float _swingSpan2, float _twistSpan) {
+	public void setLimit(double _swingSpan1, double _swingSpan2, double _twistSpan) {
 		setLimit(_swingSpan1, _swingSpan2, _twistSpan, 0.8f, 0.3f, 1.0f);
 	}
 
-	public void setLimit(float _swingSpan1, float _swingSpan2, float _twistSpan, float _softness, float _biasFactor, float _relaxationFactor) {
+	public void setLimit(double _swingSpan1, double _swingSpan2, double _twistSpan, double _softness, double _biasFactor, double _relaxationFactor) {
 		swingSpan1 = _swingSpan1;
 		swingSpan2 = _swingSpan2;
 		twistSpan = _twistSpan;
@@ -408,8 +408,8 @@ public class ConeTwistConstraint extends TypedConstraint {
 		return solveTwistLimit;
 	}
 
-	public float getTwistLimitSign() {
+	public double getTwistLimitSign() {
 		return twistLimitSign;
 	}
-	
+
 }

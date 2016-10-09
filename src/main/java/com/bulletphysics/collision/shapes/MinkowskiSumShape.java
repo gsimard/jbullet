@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -27,12 +27,12 @@ import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
 import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * MinkowskiSumShape is only for advanced users. This shape represents implicit
  * based minkowski sum of two convex implicit shapes.
- * 
+ *
  * @author jezek2
  */
 public class MinkowskiSumShape extends ConvexInternalShape {
@@ -48,12 +48,12 @@ public class MinkowskiSumShape extends ConvexInternalShape {
 		this.transA.setIdentity();
 		this.transB.setIdentity();
 	}
-	
+
 	@Override
-	public Vector3f localGetSupportingVertexWithoutMargin(Vector3f vec, Vector3f out) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		Vector3f supVertexA = Stack.alloc(Vector3f.class);
-		Vector3f supVertexB = Stack.alloc(Vector3f.class);
+	public Vector3d localGetSupportingVertexWithoutMargin(Vector3d vec, Vector3d out) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+		Vector3d supVertexA = Stack.alloc(Vector3d.class);
+		Vector3d supVertexB = Stack.alloc(Vector3d.class);
 
 		// btVector3 supVertexA = m_transA(m_shapeA->localGetSupportingVertexWithoutMargin(-vec*m_transA.getBasis()));
 		tmp.negate(vec);
@@ -72,7 +72,7 @@ public class MinkowskiSumShape extends ConvexInternalShape {
 	}
 
 	@Override
-	public void batchedUnitVectorGetSupportingVertexWithoutMargin(Vector3f[] vectors, Vector3f[] supportVerticesOut, int numVectors) {
+	public void batchedUnitVectorGetSupportingVertexWithoutMargin(Vector3d[] vectors, Vector3d[] supportVerticesOut, int numVectors) {
 		//todo: could make recursive use of batching. probably this shape is not used frequently.
 		for (int i = 0; i < numVectors; i++) {
 			localGetSupportingVertexWithoutMargin(vectors[i], supportVerticesOut[i]);
@@ -80,7 +80,7 @@ public class MinkowskiSumShape extends ConvexInternalShape {
 	}
 
 	@Override
-	public void getAabb(Transform t, Vector3f aabbMin, Vector3f aabbMax) {
+	public void getAabb(Transform t, Vector3d aabbMin, Vector3d aabbMax) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -90,7 +90,7 @@ public class MinkowskiSumShape extends ConvexInternalShape {
 	}
 
 	@Override
-	public void calculateLocalInertia(float mass, Vector3f inertia) {
+	public void calculateLocalInertia(double mass, Vector3d inertia) {
 		assert (false);
 		inertia.set(0, 0, 0);
 	}
@@ -99,9 +99,9 @@ public class MinkowskiSumShape extends ConvexInternalShape {
 	public String getName() {
 		return "MinkowskiSum";
 	}
-	
+
 	@Override
-	public float getMargin() {
+	public double getMargin() {
 		return shapeA.getMargin() + shapeB.getMargin();
 	}
 

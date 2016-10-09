@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -32,7 +32,7 @@ import com.bulletphysics.collision.shapes.VertexData;
 import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -40,16 +40,16 @@ import javax.vecmath.Vector3f;
  */
 class TrimeshPrimitiveManager extends PrimitiveManagerBase {
 
-	public float margin;
+	public double margin;
 	public StridingMeshInterface meshInterface;
-	public final Vector3f scale = new Vector3f();
+	public final Vector3d scale = new Vector3d();
 	public int part;
 	public int lock_count;
 
 	private final int[] tmpIndices = new int[3];
 
 	private VertexData vertexData;
-	
+
 	public TrimeshPrimitiveManager() {
 		meshInterface = null;
 		part = 0;
@@ -96,7 +96,7 @@ class TrimeshPrimitiveManager extends PrimitiveManagerBase {
 		vertexData = null;
 		lock_count = 0;
 	}
-	
+
 	@Override
 	public boolean is_trimesh() {
 		return true;
@@ -117,11 +117,11 @@ class TrimeshPrimitiveManager extends PrimitiveManagerBase {
 		out[2] = vertexData.getIndex(face_index*3+2);
 	}
 
-	public void get_vertex(int vertex_index, Vector3f vertex) {
+	public void get_vertex(int vertex_index, Vector3d vertex) {
 		vertexData.getVertex(vertex_index, vertex);
 		VectorUtil.mul(vertex, vertex, scale);
 	}
-	
+
 	@Override
 	public void get_primitive_box(int prim_index, AABB primbox) {
 		PrimitiveTriangle triangle = Stack.alloc(PrimitiveTriangle.class);
@@ -147,5 +147,5 @@ class TrimeshPrimitiveManager extends PrimitiveManagerBase {
 		get_vertex(tmpIndices[2], triangle.vertices1[2]);
 		triangle.setMargin(margin);
 	}
-	
+
 }

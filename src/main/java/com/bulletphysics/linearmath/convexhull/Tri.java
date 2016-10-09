@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -28,11 +28,11 @@ package com.bulletphysics.linearmath.convexhull;
  * @author jezek2
  */
 class Tri extends Int3 {
-	
+
 	public Int3 n = new Int3();
 	public int id;
 	public int vmax;
-	public float rise;
+	public double rise;
 
 	public Tri(int a, int b, int c) {
 		super(a, b, c);
@@ -42,7 +42,7 @@ class Tri extends Int3 {
 	}
 
 	private static int er = -1;
-	
+
 	private static IntRef erRef = new IntRef() {
 		@Override
 		public int get() {
@@ -54,12 +54,12 @@ class Tri extends Int3 {
 			er = value;
 		}
 	};
-	
+
 	public IntRef neib(int a, int b) {
 		for (int i = 0; i < 3; i++) {
 			int i1 = (i + 1) % 3;
 			int i2 = (i + 2) % 3;
-			
+
 			if (getCoord(i) == a && getCoord(i1) == b) {
 				return n.getRef(i2);
 			}

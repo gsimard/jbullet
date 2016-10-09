@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -30,8 +30,8 @@ package com.bulletphysics.extras.gimpact;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4d;
 
 /**
  *
@@ -39,37 +39,37 @@ import javax.vecmath.Vector4f;
  */
 public class PrimitiveTriangle {
 
-	private final ObjectArrayList<Vector3f> tmpVecList1 = new ObjectArrayList<Vector3f>(TriangleContact.MAX_TRI_CLIPPING);
-	private final ObjectArrayList<Vector3f> tmpVecList2 = new ObjectArrayList<Vector3f>(TriangleContact.MAX_TRI_CLIPPING);
-	private final ObjectArrayList<Vector3f> tmpVecList3 = new ObjectArrayList<Vector3f>(TriangleContact.MAX_TRI_CLIPPING);
-	
+	private final ObjectArrayList<Vector3d> tmpVecList1 = new ObjectArrayList<Vector3d>(TriangleContact.MAX_TRI_CLIPPING);
+	private final ObjectArrayList<Vector3d> tmpVecList2 = new ObjectArrayList<Vector3d>(TriangleContact.MAX_TRI_CLIPPING);
+	private final ObjectArrayList<Vector3d> tmpVecList3 = new ObjectArrayList<Vector3d>(TriangleContact.MAX_TRI_CLIPPING);
+
 	{
 		for (int i=0; i<TriangleContact.MAX_TRI_CLIPPING; i++) {
-			tmpVecList1.add(new Vector3f());
-			tmpVecList2.add(new Vector3f());
-			tmpVecList3.add(new Vector3f());
+			tmpVecList1.add(new Vector3d());
+			tmpVecList2.add(new Vector3d());
+			tmpVecList3.add(new Vector3d());
 		}
 	}
-	
-	public final Vector3f[] vertices = new Vector3f[3];
-	public final Vector4f plane = new Vector4f();
-	public float margin = 0.01f;
+
+	public final Vector3d[] vertices = new Vector3d[3];
+	public final Vector4d plane = new Vector4d();
+	public double margin = 0.01f;
 
 	public PrimitiveTriangle() {
 		for (int i=0; i<vertices.length; i++) {
-			vertices[i] = new Vector3f();
+			vertices[i] = new Vector3d();
 		}
 	}
-	
+
 	public void set(PrimitiveTriangle tri) {
 		throw new UnsupportedOperationException();
 	}
-	
-	public void buildTriPlane() {
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
 
-		Vector3f normal = Stack.alloc(Vector3f.class);
+	public void buildTriPlane() {
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
+
+		Vector3d normal = Stack.alloc(Vector3d.class);
 		tmp1.sub(vertices[1], vertices[0]);
 		tmp2.sub(vertices[2], vertices[0]);
 		normal.cross(tmp1, tmp2);
@@ -82,18 +82,18 @@ public class PrimitiveTriangle {
 	 * Test if triangles could collide.
 	 */
 	public boolean overlap_test_conservative(PrimitiveTriangle other) {
-		float total_margin = margin + other.margin;
+		double total_margin = margin + other.margin;
 		// classify points on other triangle
-		float dis0 = ClipPolygon.distance_point_plane(plane, other.vertices[0]) - total_margin;
+		double dis0 = ClipPolygon.distance_point_plane(plane, other.vertices[0]) - total_margin;
 
-		float dis1 = ClipPolygon.distance_point_plane(plane, other.vertices[1]) - total_margin;
+		double dis1 = ClipPolygon.distance_point_plane(plane, other.vertices[1]) - total_margin;
 
-		float dis2 = ClipPolygon.distance_point_plane(plane, other.vertices[2]) - total_margin;
+		double dis2 = ClipPolygon.distance_point_plane(plane, other.vertices[2]) - total_margin;
 
 		if (dis0 > 0.0f && dis1 > 0.0f && dis2 > 0.0f) {
 			return false; // classify points on this triangle
 		}
-		
+
 		dis0 = ClipPolygon.distance_point_plane(other.plane, vertices[0]) - total_margin;
 
 		dis1 = ClipPolygon.distance_point_plane(other.plane, vertices[1]) - total_margin;
@@ -105,16 +105,16 @@ public class PrimitiveTriangle {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Calcs the plane which is paralele to the edge and perpendicular to the triangle plane.
 	 * This triangle must have its plane calculated.
 	 */
-	public void get_edge_plane(int edge_index, Vector4f plane) {
-		Vector3f e0 = vertices[edge_index];
-		Vector3f e1 = vertices[(edge_index + 1) % 3];
+	public void get_edge_plane(int edge_index, Vector4d plane) {
+		Vector3d e0 = vertices[edge_index];
+		Vector3d e1 = vertices[(edge_index + 1) % 3];
 
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		tmp.set(this.plane.x, this.plane.y, this.plane.z);
 
 		GeometryOperations.edge_plane(e0, e1, tmp, plane);
@@ -125,18 +125,18 @@ public class PrimitiveTriangle {
 		t.transform(vertices[1]);
 		t.transform(vertices[2]);
 	}
-	
+
 	/**
 	 * Clips the triangle against this.
-	 * 
+	 *
 	 * @param clipped_points must have MAX_TRI_CLIPPING size, and this triangle must have its plane calculated.
 	 * @return the number of clipped points
 	 */
-	public int clip_triangle(PrimitiveTriangle other, ObjectArrayList<Vector3f> clipped_points) {
+	public int clip_triangle(PrimitiveTriangle other, ObjectArrayList<Vector3d> clipped_points) {
 		// edge 0
-		ObjectArrayList<Vector3f> temp_points = tmpVecList1;
+		ObjectArrayList<Vector3d> temp_points = tmpVecList1;
 
-		Vector4f edgeplane = Stack.alloc(Vector4f.class);
+		Vector4d edgeplane = Stack.alloc(Vector4d.class);
 
 		get_edge_plane(0, edgeplane);
 
@@ -145,7 +145,7 @@ public class PrimitiveTriangle {
 		if (clipped_count == 0) {
 			return 0;
 		}
-		ObjectArrayList<Vector3f> temp_points1 = tmpVecList2;
+		ObjectArrayList<Vector3d> temp_points1 = tmpVecList2;
 
 		// edge 1
 		get_edge_plane(1, edgeplane);
@@ -161,15 +161,15 @@ public class PrimitiveTriangle {
 
 		return clipped_count;
 	}
-	
+
 	/**
 	 * Find collision using the clipping method.
 	 * This triangle and other must have their triangles calculated.
 	 */
 	public boolean find_triangle_collision_clip_method(PrimitiveTriangle other, TriangleContact contacts) {
-		float margin = this.margin + other.margin;
+		double margin = this.margin + other.margin;
 
-		ObjectArrayList<Vector3f> clipped_points = tmpVecList3;
+		ObjectArrayList<Vector3d> clipped_points = tmpVecList3;
 
 		int clipped_count;
 		//create planes
@@ -220,5 +220,5 @@ public class PrimitiveTriangle {
 		}
 		return true;
 	}
-	
+
 }

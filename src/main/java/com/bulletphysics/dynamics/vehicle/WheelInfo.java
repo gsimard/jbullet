@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -26,50 +26,50 @@ package com.bulletphysics.dynamics.vehicle;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.linearmath.Transform;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * WheelInfo contains information per wheel about friction and suspension.
- * 
+ *
  * @author jezek2
  */
 public class WheelInfo {
 
 	//protected final BulletStack stack = BulletStack.get();
-	
+
 	public final RaycastInfo raycastInfo = new RaycastInfo();
 
 	public final Transform worldTransform = new Transform();
-	
-	public final Vector3f chassisConnectionPointCS = new Vector3f(); // const
-	public final Vector3f wheelDirectionCS = new Vector3f(); // const
-	public final Vector3f wheelAxleCS = new Vector3f(); // const or modified by steering
-	public float suspensionRestLength1; // const
-	public float maxSuspensionTravelCm;
-	public float wheelsRadius; // const
-	public float suspensionStiffness; // const
-	public float wheelsDampingCompression; // const
-	public float wheelsDampingRelaxation; // const
-	public float frictionSlip;
-	public float steering;
-	public float rotation;
-	public float deltaRotation;
-	public float rollInfluence;
 
-	public float engineForce;
+	public final Vector3d chassisConnectionPointCS = new Vector3d(); // const
+	public final Vector3d wheelDirectionCS = new Vector3d(); // const
+	public final Vector3d wheelAxleCS = new Vector3d(); // const or modified by steering
+	public double suspensionRestLength1; // const
+	public double maxSuspensionTravelCm;
+	public double wheelsRadius; // const
+	public double suspensionStiffness; // const
+	public double wheelsDampingCompression; // const
+	public double wheelsDampingRelaxation; // const
+	public double frictionSlip;
+	public double steering;
+	public double rotation;
+	public double deltaRotation;
+	public double rollInfluence;
 
-	public float brake;
-	
+	public double engineForce;
+
+	public double brake;
+
 	public boolean bIsFrontWheel;
-	
+
 	public Object clientInfo; // can be used to store pointer to sync transforms...
 
-	public float clippedInvContactDotSuspension;
-	public float suspensionRelativeVelocity;
+	public double clippedInvContactDotSuspension;
+	public double suspensionRelativeVelocity;
 	// calculated by suspension
-	public float wheelsSuspensionForce;
-	public float skidInfo;
-	
+	public double wheelsSuspensionForce;
+	public double skidInfo;
+
 	public WheelInfo(WheelInfoConstructionInfo ci) {
 		suspensionRestLength1 = ci.suspensionRestLength;
 		maxSuspensionTravelCm = ci.maxSuspensionTravelCm;
@@ -90,25 +90,25 @@ public class WheelInfo {
 		rollInfluence = 0.1f;
 		bIsFrontWheel = ci.bIsFrontWheel;
 	}
-	
-	public float getSuspensionRestLength() {
+
+	public double getSuspensionRestLength() {
 		return suspensionRestLength1;
 	}
 
 	public void updateWheel(RigidBody chassis, RaycastInfo raycastInfo) {
 		if (raycastInfo.isInContact) {
-			float project = raycastInfo.contactNormalWS.dot(raycastInfo.wheelDirectionWS);
-			Vector3f chassis_velocity_at_contactPoint = Stack.alloc(Vector3f.class);
-			Vector3f relpos = Stack.alloc(Vector3f.class);
-			relpos.sub(raycastInfo.contactPointWS, chassis.getCenterOfMassPosition(Stack.alloc(Vector3f.class)));
+			double project = raycastInfo.contactNormalWS.dot(raycastInfo.wheelDirectionWS);
+			Vector3d chassis_velocity_at_contactPoint = Stack.alloc(Vector3d.class);
+			Vector3d relpos = Stack.alloc(Vector3d.class);
+			relpos.sub(raycastInfo.contactPointWS, chassis.getCenterOfMassPosition(Stack.alloc(Vector3d.class)));
 			chassis.getVelocityInLocalPoint(relpos, chassis_velocity_at_contactPoint);
-			float projVel = raycastInfo.contactNormalWS.dot(chassis_velocity_at_contactPoint);
+			double projVel = raycastInfo.contactNormalWS.dot(chassis_velocity_at_contactPoint);
 			if (project >= -0.1f) {
 				suspensionRelativeVelocity = 0f;
 				clippedInvContactDotSuspension = 1f / 0.1f;
 			}
 			else {
-				float inv = -1f / project;
+				double inv = -1f / project;
 				suspensionRelativeVelocity = projVel * inv;
 				clippedInvContactDotSuspension = inv;
 			}
@@ -121,19 +121,19 @@ public class WheelInfo {
 			clippedInvContactDotSuspension = 1f;
 		}
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	public static class RaycastInfo {
 		// set by raycaster
-		public final Vector3f contactNormalWS = new Vector3f(); // contactnormal
-		public final Vector3f contactPointWS = new Vector3f(); // raycast hitpoint
-		public float suspensionLength;
-		public final Vector3f hardPointWS = new Vector3f(); // raycast starting point
-		public final Vector3f wheelDirectionWS = new Vector3f(); // direction in worldspace
-		public final Vector3f wheelAxleWS = new Vector3f(); // axle in worldspace
+		public final Vector3d contactNormalWS = new Vector3d(); // contactnormal
+		public final Vector3d contactPointWS = new Vector3d(); // raycast hitpoint
+		public double suspensionLength;
+		public final Vector3d hardPointWS = new Vector3d(); // raycast starting point
+		public final Vector3d wheelDirectionWS = new Vector3d(); // direction in worldspace
+		public final Vector3d wheelAxleWS = new Vector3d(); // axle in worldspace
 		public boolean isInContact;
 		public Object groundObject; // could be general void* ptr
 	}
-	
+
 }

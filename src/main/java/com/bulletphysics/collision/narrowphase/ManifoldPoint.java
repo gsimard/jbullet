@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -23,56 +23,56 @@
 
 package com.bulletphysics.collision.narrowphase;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * ManifoldPoint collects and maintains persistent contactpoints. Used to improve
  * stability and performance of rigidbody dynamics response.
- * 
+ *
  * @author jezek2
  */
 public class ManifoldPoint {
 
-	public final Vector3f localPointA = new Vector3f();
-	public final Vector3f localPointB = new Vector3f();
-	public final Vector3f positionWorldOnB = new Vector3f();
+	public final Vector3d localPointA = new Vector3d();
+	public final Vector3d localPointB = new Vector3d();
+	public final Vector3d positionWorldOnB = new Vector3d();
 	///m_positionWorldOnA is redundant information, see getPositionWorldOnA(), but for clarity
-	public final Vector3f positionWorldOnA = new Vector3f();
-	public final Vector3f normalWorldOnB = new Vector3f();
-	
-	public float distance1;
-	public float combinedFriction;
-	public float combinedRestitution;
-	
+	public final Vector3d positionWorldOnA = new Vector3d();
+	public final Vector3d normalWorldOnB = new Vector3d();
+
+	public double distance1;
+	public double combinedFriction;
+	public double combinedRestitution;
+
 	// BP mod, store contact triangles.
 	public int partId0;
 	public int partId1;
 	public int index0;
 	public int index1;
-	
+
 	public Object userPersistentData;
-	public float appliedImpulse;
-	
+	public double appliedImpulse;
+
 	public boolean lateralFrictionInitialized;
-	public float appliedImpulseLateral1;
-	public float appliedImpulseLateral2;
+	public double appliedImpulseLateral1;
+	public double appliedImpulseLateral2;
 	public int lifeTime; //lifetime of the contactpoint in frames
 
-	public final Vector3f lateralFrictionDir1 = new Vector3f();
-	public final Vector3f lateralFrictionDir2 = new Vector3f();
-	
+	public final Vector3d lateralFrictionDir1 = new Vector3d();
+	public final Vector3d lateralFrictionDir2 = new Vector3d();
+
 	public ManifoldPoint() {
 		this.userPersistentData = null;
 		this.appliedImpulse = 0f;
 		this.lateralFrictionInitialized = false;
 		this.lifeTime = 0;
 	}
-	
-	public ManifoldPoint(Vector3f pointA, Vector3f pointB, Vector3f normal, float distance) {
+
+	public ManifoldPoint(Vector3d pointA, Vector3d pointB, Vector3d normal, double distance) {
 		init(pointA, pointB, normal, distance);
 	}
 
-	public void init(Vector3f pointA, Vector3f pointB, Vector3f normal, float distance) {
+	public void init(Vector3d pointA, Vector3d pointB, Vector3d normal, double distance) {
 		this.localPointA.set(pointA);
 		this.localPointB.set(pointB);
 		this.normalWorldOnB.set(normal);
@@ -87,14 +87,14 @@ public class ManifoldPoint {
 		this.lifeTime = 0;
 	}
 
-	public float getDistance() {
+	public double getDistance() {
 		return distance1;
 	}
 
 	public int getLifeTime() {
 		return lifeTime;
 	}
-	
+
 	public void set(ManifoldPoint p) {
 		localPointA.set(p.localPointA);
 		localPointB.set(p.localPointB);
@@ -117,20 +117,20 @@ public class ManifoldPoint {
 		lateralFrictionDir1.set(p.lateralFrictionDir1);
 		lateralFrictionDir2.set(p.lateralFrictionDir2);
 	}
-	
-	public Vector3f getPositionWorldOnA(Vector3f out) {
+
+	public Vector3d getPositionWorldOnA(Vector3d out) {
 		out.set(positionWorldOnA);
 		return out;
 		//return m_positionWorldOnB + m_normalWorldOnB * m_distance1;
 	}
 
-	public Vector3f getPositionWorldOnB(Vector3f out) {
+	public Vector3d getPositionWorldOnB(Vector3d out) {
 		out.set(positionWorldOnB);
 		return out;
 	}
 
-	public void setDistance(float dist) {
+	public void setDistance(double dist) {
 		distance1 = dist;
 	}
-	
+
 }

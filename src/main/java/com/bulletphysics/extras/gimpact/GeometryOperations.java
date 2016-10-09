@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -30,8 +30,8 @@ package com.bulletphysics.extras.gimpact;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4d;
 
 /**
  *
@@ -39,18 +39,18 @@ import javax.vecmath.Vector4f;
  */
 class GeometryOperations {
 
-	public static final float PLANEDIREPSILON = 0.0000001f;
-	public static final float PARALELENORMALS = 0.000001f;
-	
-	public static final float CLAMP(float number, float minval, float maxval) {
+	public static final double PLANEDIREPSILON = 0.0000001f;
+	public static final double PARALELENORMALS = 0.000001f;
+
+	public static final double CLAMP(double number, double minval, double maxval) {
 		return (number < minval? minval : (number > maxval? maxval : number));
 	}
 
 	/**
 	 * Calc a plane from a triangle edge an a normal.
 	 */
-	public static void edge_plane(Vector3f e1, Vector3f e2, Vector3f normal, Vector4f plane) {
-		Vector3f planenormal = Stack.alloc(Vector3f.class);
+	public static void edge_plane(Vector3d e1, Vector3d e2, Vector3d normal, Vector4d plane) {
+		Vector3d planenormal = Stack.alloc(Vector3d.class);
 		planenormal.sub(e2, e1);
 		planenormal.cross(planenormal, normal);
 		planenormal.normalize();
@@ -58,15 +58,15 @@ class GeometryOperations {
 		plane.set(planenormal);
 		plane.w = e2.dot(planenormal);
 	}
-	
+
 	/**
 	 * Finds the closest point(cp) to (v) on a segment (e1,e2).
 	 */
-	public static void closest_point_on_segment(Vector3f cp, Vector3f v, Vector3f e1, Vector3f e2) {
-		Vector3f n = Stack.alloc(Vector3f.class);
+	public static void closest_point_on_segment(Vector3d cp, Vector3d v, Vector3d e1, Vector3d e2) {
+		Vector3d n = Stack.alloc(Vector3d.class);
 		n.sub(e2, e1);
 		cp.sub(v, e1);
-		float _scalar = cp.dot(n) / n.dot(n);
+		double _scalar = cp.dot(n) / n.dot(n);
 		if (_scalar < 0.0f) {
 			cp = e1;
 		}
@@ -77,21 +77,21 @@ class GeometryOperations {
 			cp.scaleAdd(_scalar, n, e1);
 		}
 	}
-	
+
 	/**
 	 * Line plane collision.
-	 * 
+	 *
 	 * @return -0 if the ray never intersects, -1 if the ray collides in front, -2 if the ray collides in back
 	 */
-	public static int line_plane_collision(Vector4f plane, Vector3f vDir, Vector3f vPoint, Vector3f pout, float[] tparam, float tmin, float tmax) {
-		float _dotdir = VectorUtil.dot3(vDir, plane);
+	public static int line_plane_collision(Vector4d plane, Vector3d vDir, Vector3d vPoint, Vector3d pout, double[] tparam, double tmin, double tmax) {
+		double _dotdir = VectorUtil.dot3(vDir, plane);
 
 		if (Math.abs(_dotdir) < PLANEDIREPSILON) {
 			tparam[0] = tmax;
 			return 0;
 		}
 
-		float _dis = ClipPolygon.distance_point_plane(plane, vPoint);
+		double _dis = ClipPolygon.distance_point_plane(plane, vPoint);
 		int returnvalue = _dis < 0.0f ? 2 : 1;
 		tparam[0] = -_dis / _dotdir;
 
@@ -106,22 +106,22 @@ class GeometryOperations {
 		pout.scaleAdd(tparam[0], vDir, vPoint);
 		return returnvalue;
 	}
-	
+
 	/**
 	 * Find closest points on segments.
 	 */
-	public static void segment_collision(Vector3f vA1, Vector3f vA2, Vector3f vB1, Vector3f vB2, Vector3f vPointA, Vector3f vPointB) {
-		Vector3f AD = Stack.alloc(Vector3f.class);
+	public static void segment_collision(Vector3d vA1, Vector3d vA2, Vector3d vB1, Vector3d vB2, Vector3d vPointA, Vector3d vPointB) {
+		Vector3d AD = Stack.alloc(Vector3d.class);
 		AD.sub(vA2, vA1);
 
-		Vector3f BD = Stack.alloc(Vector3f.class);
+		Vector3d BD = Stack.alloc(Vector3d.class);
 		BD.sub(vB2, vB1);
 
-		Vector3f N = Stack.alloc(Vector3f.class);
+		Vector3d N = Stack.alloc(Vector3d.class);
 		N.cross(AD, BD);
-		float[] tp = new float[] { N.lengthSquared() };
+		double[] tp = new double[] { N.lengthSquared() };
 
-		Vector4f _M = Stack.alloc(Vector4f.class);//plane
+		Vector4d _M = Stack.alloc(Vector4d.class);//plane
 
 		if (tp[0] < BulletGlobals.SIMD_EPSILON)//ARE PARALELE
 		{
@@ -188,5 +188,5 @@ class GeometryOperations {
 
 		vPointB.scaleAdd(tp[0], BD, vB1);
 	}
-	
+
 }

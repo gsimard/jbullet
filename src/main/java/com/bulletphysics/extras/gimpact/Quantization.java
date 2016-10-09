@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -29,7 +29,7 @@ package com.bulletphysics.extras.gimpact;
 
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -37,24 +37,24 @@ import javax.vecmath.Vector3f;
  */
 class Quantization {
 
-	public static void bt_calc_quantization_parameters(Vector3f outMinBound, Vector3f outMaxBound, Vector3f bvhQuantization, Vector3f srcMinBound, Vector3f srcMaxBound, float quantizationMargin) {
+	public static void bt_calc_quantization_parameters(Vector3d outMinBound, Vector3d outMaxBound, Vector3d bvhQuantization, Vector3d srcMinBound, Vector3d srcMaxBound, double quantizationMargin) {
 		// enlarge the AABB to avoid division by zero when initializing the quantization values
-		Vector3f clampValue = Stack.alloc(Vector3f.class);
+		Vector3d clampValue = Stack.alloc(Vector3d.class);
 		clampValue.set(quantizationMargin, quantizationMargin, quantizationMargin);
 		outMinBound.sub(srcMinBound, clampValue);
 		outMaxBound.add(srcMaxBound, clampValue);
-		Vector3f aabbSize = Stack.alloc(Vector3f.class);
+		Vector3d aabbSize = Stack.alloc(Vector3d.class);
 		aabbSize.sub(outMaxBound, outMinBound);
 		bvhQuantization.set(65535.0f, 65535.0f, 65535.0f);
 		VectorUtil.div(bvhQuantization, bvhQuantization, aabbSize);
 	}
 
-	public static void bt_quantize_clamp(short[] out, Vector3f point, Vector3f min_bound, Vector3f max_bound, Vector3f bvhQuantization) {
-		Vector3f clampedPoint = Stack.alloc(point);
+	public static void bt_quantize_clamp(short[] out, Vector3d point, Vector3d min_bound, Vector3d max_bound, Vector3d bvhQuantization) {
+		Vector3d clampedPoint = Stack.alloc(point);
 		VectorUtil.setMax(clampedPoint, min_bound);
 		VectorUtil.setMin(clampedPoint, max_bound);
 
-		Vector3f v = Stack.alloc(Vector3f.class);
+		Vector3d v = Stack.alloc(Vector3d.class);
 		v.sub(clampedPoint, min_bound);
 		VectorUtil.mul(v, v, bvhQuantization);
 
@@ -63,12 +63,12 @@ class Quantization {
 		out[2] = (short) (v.z + 0.5f);
 	}
 
-	public static Vector3f bt_unquantize(short[] vecIn, Vector3f offset, Vector3f bvhQuantization, Vector3f out) {
-		out.set((float)(vecIn[0] & 0xFFFF) / (bvhQuantization.x),
-		        (float)(vecIn[1] & 0xFFFF) / (bvhQuantization.y),
-		        (float)(vecIn[2] & 0xFFFF) / (bvhQuantization.z));
+	public static Vector3d bt_unquantize(short[] vecIn, Vector3d offset, Vector3d bvhQuantization, Vector3d out) {
+		out.set((double)(vecIn[0] & 0xFFFF) / (bvhQuantization.x),
+		        (double)(vecIn[1] & 0xFFFF) / (bvhQuantization.y),
+		        (double)(vecIn[2] & 0xFFFF) / (bvhQuantization.z));
 		out.add(offset);
 		return out;
 	}
-	
+
 }

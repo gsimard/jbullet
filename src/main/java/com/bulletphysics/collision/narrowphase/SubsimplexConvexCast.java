@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -29,20 +29,20 @@ import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * SubsimplexConvexCast implements Gino van den Bergens' paper
  * "Ray Casting against bteral Convex Objects with Application to Continuous Collision Detection"
  * GJK based Ray Cast, optimized version
  * Objects should not start in overlap, otherwise results are not defined.
- * 
+ *
  * @author jezek2
  */
 public class SubsimplexConvexCast extends ConvexCast {
 
 	//protected final BulletStack stack = BulletStack.get();
-	
+
 	// Typically the conservative advancement reaches solution in a few iterations, clip it to 32 for degenerate cases.
 	// See discussion about this here http://www.bulletphysics.com/phpBB2/viewtopic.php?t=565
 	//#ifdef BT_USE_DOUBLE_PRECISION
@@ -50,9 +50,9 @@ public class SubsimplexConvexCast extends ConvexCast {
 	//#else
 	//#define MAX_ITERATIONS 32
 	//#endif
-	
-	private static final int MAX_ITERATIONS = 32;
-	
+
+	private static final int MAX_ITERATIONS = 64;
+
 	private SimplexSolverInterface simplexSolver;
 	private ConvexShape convexA;
 	private ConvexShape convexB;
@@ -62,75 +62,75 @@ public class SubsimplexConvexCast extends ConvexCast {
 		this.convexB = shapeB;
 		this.simplexSolver = simplexSolver;
 	}
-	
+
 	public boolean calcTimeOfImpact(Transform fromA, Transform toA, Transform fromB, Transform toB, CastResult result) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
-		
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+
 		simplexSolver.reset();
 
-		Vector3f linVelA = Stack.alloc(Vector3f.class);
-		Vector3f linVelB = Stack.alloc(Vector3f.class);
+		Vector3d linVelA = Stack.alloc(Vector3d.class);
+		Vector3d linVelB = Stack.alloc(Vector3d.class);
 		linVelA.sub(toA.origin, fromA.origin);
 		linVelB.sub(toB.origin, fromB.origin);
-		
-		float lambda = 0f;
-		
+
+		double lambda = 0f;
+
 		Transform interpolatedTransA = Stack.alloc(fromA);
 		Transform interpolatedTransB = Stack.alloc(fromB);
 
 		// take relative motion
-		Vector3f r = Stack.alloc(Vector3f.class);
+		Vector3d r = Stack.alloc(Vector3d.class);
 		r.sub(linVelA, linVelB);
-		
-		Vector3f v = Stack.alloc(Vector3f.class);
+
+		Vector3d v = Stack.alloc(Vector3d.class);
 
 		tmp.negate(r);
 		MatrixUtil.transposeTransform(tmp, tmp, fromA.basis);
-		Vector3f supVertexA = convexA.localGetSupportingVertex(tmp, Stack.alloc(Vector3f.class));
+		Vector3d supVertexA = convexA.localGetSupportingVertex(tmp, Stack.alloc(Vector3d.class));
 		fromA.transform(supVertexA);
-		
+
 		MatrixUtil.transposeTransform(tmp, r, fromB.basis);
-		Vector3f supVertexB = convexB.localGetSupportingVertex(tmp, Stack.alloc(Vector3f.class));
+		Vector3d supVertexB = convexB.localGetSupportingVertex(tmp, Stack.alloc(Vector3d.class));
 		fromB.transform(supVertexB);
-		
+
 		v.sub(supVertexA, supVertexB);
-		
+
 		int maxIter = MAX_ITERATIONS;
 
-		Vector3f n = Stack.alloc(Vector3f.class);
+		Vector3d n = Stack.alloc(Vector3d.class);
 		n.set(0f, 0f, 0f);
 		boolean hasResult = false;
-		Vector3f c = Stack.alloc(Vector3f.class);
+		Vector3d c = Stack.alloc(Vector3d.class);
 
-		float lastLambda = lambda;
+		double lastLambda = lambda;
 
-		float dist2 = v.lengthSquared();
+		double dist2 = v.lengthSquared();
 		//#ifdef BT_USE_DOUBLE_PRECISION
 		//	btScalar epsilon = btScalar(0.0001);
 		//#else
-		float epsilon = 0.0001f;
+		double epsilon = 0.0001;
 		//#endif
-		Vector3f w = Stack.alloc(Vector3f.class), p = Stack.alloc(Vector3f.class);
-		float VdotR;
+		Vector3d w = Stack.alloc(Vector3d.class), p = Stack.alloc(Vector3d.class);
+		double VdotR;
 
 		while ((dist2 > epsilon) && (maxIter--) != 0) {
 			tmp.negate(v);
 			MatrixUtil.transposeTransform(tmp, tmp, interpolatedTransA.basis);
 			convexA.localGetSupportingVertex(tmp, supVertexA);
 			interpolatedTransA.transform(supVertexA);
-			
+
 			MatrixUtil.transposeTransform(tmp, v, interpolatedTransB.basis);
 			convexB.localGetSupportingVertex(tmp, supVertexB);
 			interpolatedTransB.transform(supVertexB);
-			
+
 			w.sub(supVertexA, supVertexB);
 
-			float VdotW = v.dot(w);
+			double VdotW = v.dot(w);
 
 			if (lambda > 1f) {
 				return false;
 			}
-			
+
 			if (VdotW > 0f) {
 				VdotR = v.dot(r);
 
@@ -139,7 +139,7 @@ public class SubsimplexConvexCast extends ConvexCast {
 				}
 				else {
 					lambda = lambda - VdotW / VdotR;
-					
+
 					// interpolate to next lambda
 					//	x = s + lambda * r;
 					VectorUtil.setInterpolate3(interpolatedTransA.origin, fromA.origin, toA.origin, lambda);
@@ -169,9 +169,9 @@ public class SubsimplexConvexCast extends ConvexCast {
 
 		//int numiter = MAX_ITERATIONS - maxIter;
 		//	printf("number of iterations: %d", numiter);
-	
+
 		// don't report a time of impact when moving 'away' from the hitnormal
-		
+
 		result.fraction = lambda;
 		if (n.lengthSquared() >= BulletGlobals.SIMD_EPSILON * BulletGlobals.SIMD_EPSILON) {
 			result.normal.normalize(n);
@@ -184,8 +184,8 @@ public class SubsimplexConvexCast extends ConvexCast {
 		if (result.normal.dot(r) >= -result.allowedPenetration)
 			return false;
 
-		Vector3f hitA = Stack.alloc(Vector3f.class);
-		Vector3f hitB = Stack.alloc(Vector3f.class);
+		Vector3d hitA = Stack.alloc(Vector3d.class);
+		Vector3d hitB = Stack.alloc(Vector3d.class);
 		simplexSolver.compute_points(hitA,hitB);
 		result.hitPoint.set(hitB);
 		return true;

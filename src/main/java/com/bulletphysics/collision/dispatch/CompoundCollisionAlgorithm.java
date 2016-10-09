@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -37,17 +37,17 @@ import cz.advel.stack.Stack;
 /**
  * CompoundCollisionAlgorithm supports collision between {@link CompoundShape}s and
  * other collision shapes.
- * 
+ *
  * @author jezek2
  */
 public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 
 	private final ObjectArrayList<CollisionAlgorithm> childCollisionAlgorithms = new ObjectArrayList<CollisionAlgorithm>();
 	private boolean isSwapped;
-	
+
 	public void init(CollisionAlgorithmConstructionInfo ci, CollisionObject body0, CollisionObject body1, boolean isSwapped) {
 		super.init(ci);
-		
+
 		this.isSwapped = isSwapped;
 
 		CollisionObject colObj = isSwapped ? body1 : body0;
@@ -77,7 +77,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		}
 		childCollisionAlgorithms.clear();
 	}
-	
+
 	@Override
 	public void processCollision(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		CollisionObject colObj = isSwapped ? body1 : body0;
@@ -113,7 +113,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 			newChildWorldTrans.mul(orgTrans, childTrans);
 			colObj.setWorldTransform(newChildWorldTrans);
 			colObj.setInterpolationWorldTransform(newChildWorldTrans);
-			
+
 			// the contactpoint is still projected back using the original inverted worldtrans
 			CollisionShape tmpShape = colObj.getCollisionShape();
 			colObj.internalSetTemporaryCollisionShape(childShape);
@@ -126,7 +126,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 	}
 
 	@Override
-	public float calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
+	public double calculateTimeOfImpact(CollisionObject body0, CollisionObject body1, DispatcherInfo dispatchInfo, ManifoldResult resultOut) {
 		CollisionObject colObj = isSwapped ? body1 : body0;
 		CollisionObject otherObj = isSwapped ? body0 : body1;
 
@@ -144,7 +144,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		Transform tmpTrans = Stack.alloc(Transform.class);
 		Transform orgTrans = Stack.alloc(Transform.class);
 		Transform childTrans = Stack.alloc(Transform.class);
-		float hitFraction = 1f;
+		double hitFraction = 1f;
 
 		int numChildren = childCollisionAlgorithms.size();
 		int i;
@@ -163,7 +163,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 
 			CollisionShape tmpShape = colObj.getCollisionShape();
 			colObj.internalSetTemporaryCollisionShape(childShape);
-			float frac = childCollisionAlgorithms.getQuick(i).calculateTimeOfImpact(colObj, otherObj, dispatchInfo, resultOut);
+			double frac = childCollisionAlgorithms.getQuick(i).calculateTimeOfImpact(colObj, otherObj, dispatchInfo, resultOut);
 			if (frac < hitFraction) {
 				hitFraction = frac;
 			}
@@ -180,9 +180,9 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 			childCollisionAlgorithms.getQuick(i).getAllContactManifolds(manifoldArray);
 		}
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////
-	
+
 	public static class CreateFunc extends CollisionAlgorithmCreateFunc {
 		private final ObjectPool<CompoundCollisionAlgorithm> pool = ObjectPool.get(CompoundCollisionAlgorithm.class);
 
@@ -198,7 +198,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 			pool.release((CompoundCollisionAlgorithm)algo);
 		}
 	};
-	
+
 	public static class SwappedCreateFunc extends CollisionAlgorithmCreateFunc {
 		private final ObjectPool<CompoundCollisionAlgorithm> pool = ObjectPool.get(CompoundCollisionAlgorithm.class);
 

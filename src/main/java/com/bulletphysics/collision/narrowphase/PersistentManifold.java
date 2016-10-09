@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -24,45 +24,46 @@
 package com.bulletphysics.collision.narrowphase;
 
 import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.BulletStats;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4d;
 
 
 /**
  * PersistentManifold is a contact point cache, it stays persistent as long as objects
  * are overlapping in the broadphase. Those contact points are created by the collision
  * narrow phase.<p>
- * 
+ *
  * The cache can be empty, or hold 1, 2, 3 or 4 points. Some collision algorithms (GJK)
  * might only add one point at a time, updates/refreshes old contact points, and throw
  * them away if necessary (distance becomes too large).<p>
- * 
+ *
  * Reduces the cache to 4 points, when more then 4 points are added, using following rules:
  * the contact point with deepest penetration is always kept, and it tries to maximize the
  * area covered by the points.<p>
- * 
+ *
  * Note that some pairs of objects might have more then one contact manifold.
- * 
+ *
  * @author jezek2
  */
 public class PersistentManifold {
 
 	//protected final BulletStack stack = BulletStack.get();
-	
+
 	public static final int MANIFOLD_CACHE_SIZE = 4;
-	
+
 	private final ManifoldPoint[] pointCache = new ManifoldPoint[MANIFOLD_CACHE_SIZE];
 	/// this two body pointers can point to the physics rigidbody class.
 	/// void* will allow any rigidbody class
 	private Object body0;
 	private Object body1;
 	private int cachedPoints;
-	
+
 	public int index1a;
-	
+
 	{
 		for (int i=0; i<pointCache.length; i++) pointCache[i] = new ManifoldPoint();
 	}
@@ -89,7 +90,7 @@ public class PersistentManifold {
 		int maxPenetrationIndex = -1;
 //#define KEEP_DEEPEST_POINT 1
 //#ifdef KEEP_DEEPEST_POINT
-		float maxPenetration = pt.getDistance();
+		double maxPenetration = pt.getDistance();
 		for (int i = 0; i < 4; i++) {
 			if (pointCache[i].getDistance() < maxPenetration) {
 				maxPenetrationIndex = i;
@@ -98,58 +99,58 @@ public class PersistentManifold {
 		}
 //#endif //KEEP_DEEPEST_POINT
 
-		float res0 = 0f, res1 = 0f, res2 = 0f, res3 = 0f;
+		double res0 = 0f, res1 = 0f, res2 = 0f, res3 = 0f;
 		if (maxPenetrationIndex != 0) {
-			Vector3f a0 = Stack.alloc(pt.localPointA);
+			Vector3d a0 = Stack.alloc(pt.localPointA);
 			a0.sub(pointCache[1].localPointA);
 
-			Vector3f b0 = Stack.alloc(pointCache[3].localPointA);
+			Vector3d b0 = Stack.alloc(pointCache[3].localPointA);
 			b0.sub(pointCache[2].localPointA);
 
-			Vector3f cross = Stack.alloc(Vector3f.class);
+			Vector3d cross = Stack.alloc(Vector3d.class);
 			cross.cross(a0, b0);
 
 			res0 = cross.lengthSquared();
 		}
 
 		if (maxPenetrationIndex != 1) {
-			Vector3f a1 = Stack.alloc(pt.localPointA);
+			Vector3d a1 = Stack.alloc(pt.localPointA);
 			a1.sub(pointCache[0].localPointA);
 
-			Vector3f b1 = Stack.alloc(pointCache[3].localPointA);
+			Vector3d b1 = Stack.alloc(pointCache[3].localPointA);
 			b1.sub(pointCache[2].localPointA);
 
-			Vector3f cross = Stack.alloc(Vector3f.class);
+			Vector3d cross = Stack.alloc(Vector3d.class);
 			cross.cross(a1, b1);
 			res1 = cross.lengthSquared();
 		}
 
 		if (maxPenetrationIndex != 2) {
-			Vector3f a2 = Stack.alloc(pt.localPointA);
+			Vector3d a2 = Stack.alloc(pt.localPointA);
 			a2.sub(pointCache[0].localPointA);
 
-			Vector3f b2 = Stack.alloc(pointCache[3].localPointA);
+			Vector3d b2 = Stack.alloc(pointCache[3].localPointA);
 			b2.sub(pointCache[1].localPointA);
 
-			Vector3f cross = Stack.alloc(Vector3f.class);
+			Vector3d cross = Stack.alloc(Vector3d.class);
 			cross.cross(a2, b2);
 
 			res2 = cross.lengthSquared();
 		}
 
 		if (maxPenetrationIndex != 3) {
-			Vector3f a3 = Stack.alloc(pt.localPointA);
+			Vector3d a3 = Stack.alloc(pt.localPointA);
 			a3.sub(pointCache[0].localPointA);
 
-			Vector3f b3 = Stack.alloc(pointCache[2].localPointA);
+			Vector3d b3 = Stack.alloc(pointCache[2].localPointA);
 			b3.sub(pointCache[1].localPointA);
 
-			Vector3f cross = Stack.alloc(Vector3f.class);
+			Vector3d cross = Stack.alloc(Vector3d.class);
 			cross.cross(a3, b3);
 			res3 = cross.lengthSquared();
 		}
 
-		Vector4f maxvec = Stack.alloc(Vector4f.class);
+		Vector4d maxvec = Stack.alloc(Vector4d.class);
 		maxvec.set(res0, res1, res2, res3);
 		int biggestarea = VectorUtil.closestAxis4(maxvec);
 		return biggestarea;
@@ -169,7 +170,7 @@ public class PersistentManifold {
 		this.body0 = body0;
 		this.body1 = body1;
 	}
-	
+
 	public void clearUserCache(ManifoldPoint pt) {
 		Object oldPtr = pt.userPersistentData;
 		if (oldPtr != null) {
@@ -207,21 +208,21 @@ public class PersistentManifold {
 	}
 
 	// todo: get this margin from the current physics / collision environment
-	public float getContactBreakingThreshold() {
+	public double getContactBreakingThreshold() {
 		return BulletGlobals.getContactBreakingThreshold();
 	}
 
 	public int getCacheEntry(ManifoldPoint newPoint) {
-		float shortestDist = getContactBreakingThreshold() * getContactBreakingThreshold();
+		double shortestDist = getContactBreakingThreshold() * getContactBreakingThreshold();
 		int size = getNumContacts();
 		int nearestPoint = -1;
-		Vector3f diffA = Stack.alloc(Vector3f.class);
+		Vector3d diffA = Stack.alloc(Vector3d.class);
 		for (int i = 0; i < size; i++) {
 			ManifoldPoint mp = pointCache[i];
 
 			diffA.sub(mp.localPointA, newPoint.localPointA);
 
-			float distToManiPoint = diffA.dot(diffA);
+			double distToManiPoint = diffA.dot(diffA);
 			if (distToManiPoint < shortestDist) {
 				shortestDist = distToManiPoint;
 				nearestPoint = i;
@@ -245,7 +246,7 @@ public class PersistentManifold {
 				insertIndex = 0;
 			}
 			//#endif
-			
+
 			clearUserCache(pointCache[insertIndex]);
 		}
 		else {
@@ -283,9 +284,9 @@ public class PersistentManifold {
 //#define MAINTAIN_PERSISTENCY 1
 //#ifdef MAINTAIN_PERSISTENCY
 		int lifeTime = pointCache[insertIndex].getLifeTime();
-		float appliedImpulse = pointCache[insertIndex].appliedImpulse;
-		float appliedLateralImpulse1 = pointCache[insertIndex].appliedImpulseLateral1;
-		float appliedLateralImpulse2 = pointCache[insertIndex].appliedImpulseLateral2;
+		double appliedImpulse = pointCache[insertIndex].appliedImpulse;
+		double appliedLateralImpulse1 = pointCache[insertIndex].appliedImpulseLateral1;
+		double appliedLateralImpulse2 = pointCache[insertIndex].appliedImpulseLateral2;
 
 		assert (lifeTime >= 0);
 		Object cache = pointCache[insertIndex].userPersistentData;
@@ -310,7 +311,7 @@ public class PersistentManifold {
 
 	/// calculated new worldspace coordinates and depth, and reject points that exceed the collision margin
 	public void refreshContactPoints(Transform trA, Transform trB) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		int i;
 //#ifdef DEBUG_PERSISTENCY
 //	printf("refreshContactPoints posA = (%f,%f,%f) posB = (%f,%f,%f)\n",
@@ -338,9 +339,9 @@ public class PersistentManifold {
 			manifoldPoint.lifeTime++;
 		}
 
-		// then 
-		float distance2d;
-		Vector3f projectedDifference = Stack.alloc(Vector3f.class), projectedPoint = Stack.alloc(Vector3f.class);
+		// then
+		double distance2d;
+		Vector3d projectedDifference = Stack.alloc(Vector3d.class), projectedPoint = Stack.alloc(Vector3d.class);
 
 		for (i = getNumContacts() - 1; i >= 0; i--) {
 
@@ -378,5 +379,5 @@ public class PersistentManifold {
 		}
 		cachedPoints = 0;
 	}
-	
+
 }

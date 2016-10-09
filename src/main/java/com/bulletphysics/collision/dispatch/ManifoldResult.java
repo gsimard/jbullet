@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -30,18 +30,18 @@ import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
 import com.bulletphysics.linearmath.Transform;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * ManifoldResult is helper class to manage contact results.
- * 
+ *
  * @author jezek2
  */
 public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 
 	//protected final BulletStack stack = BulletStack.get();
 	protected final ObjectPool<ManifoldPoint> pointsPool = ObjectPool.get(ManifoldPoint.class);
-	
+
 	private PersistentManifold manifoldPtr;
 
 	// we need this for compounds
@@ -83,7 +83,7 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 		this.index1 = index1;
 	}
 
-	public void addContactPoint(Vector3f normalOnBInWorld, Vector3f pointInWorld, float depth) {
+	public void addContactPoint(Vector3d normalOnBInWorld, Vector3d pointInWorld, double depth) {
 		assert (manifoldPtr != null);
 		//order in manifold needs to match
 
@@ -93,11 +93,11 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 
 		boolean isSwapped = manifoldPtr.getBody0() != body0;
 
-		Vector3f pointA = Stack.alloc(Vector3f.class);
+		Vector3d pointA = Stack.alloc(Vector3d.class);
 		pointA.scaleAdd(depth, normalOnBInWorld, pointInWorld);
 
-		Vector3f localA = Stack.alloc(Vector3f.class);
-		Vector3f localB = Stack.alloc(Vector3f.class);
+		Vector3d localA = Stack.alloc(Vector3d.class);
+		Vector3d localB = Stack.alloc(Vector3d.class);
 
 		if (isSwapped) {
 			rootTransB.invXform(pointA, localA);
@@ -149,10 +149,10 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 	}
 
 	///User can override this material combiner by implementing gContactAddedCallback and setting body0->m_collisionFlags |= btCollisionObject::customMaterialCallback;
-	private static float calculateCombinedFriction(CollisionObject body0, CollisionObject body1) {
-		float friction = body0.getFriction() * body1.getFriction();
+	private static double calculateCombinedFriction(CollisionObject body0, CollisionObject body1) {
+		double friction = body0.getFriction() * body1.getFriction();
 
-		float MAX_FRICTION = 10f;
+		double MAX_FRICTION = 10f;
 		if (friction < -MAX_FRICTION) {
 			friction = -MAX_FRICTION;
 		}
@@ -162,7 +162,7 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 		return friction;
 	}
 
-	private static float calculateCombinedRestitution(CollisionObject body0, CollisionObject body1) {
+	private static double calculateCombinedRestitution(CollisionObject body0, CollisionObject body1) {
 		return body0.getRestitution() * body1.getRestitution();
 	}
 

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -26,24 +26,24 @@ package com.bulletphysics.linearmath;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.util.ArrayPool;
 import cz.advel.stack.Stack;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Vector3d;
 
 /**
  * Utility functions for matrices.
- * 
+ *
  * @author jezek2
  */
 public class MatrixUtil {
-	
-	public static void scale(Matrix3f dest, Matrix3f mat, Vector3f s) {
+
+	public static void scale(Matrix3d dest, Matrix3d mat, Vector3d s) {
 		dest.m00 = mat.m00 * s.x;   dest.m01 = mat.m01 * s.y;   dest.m02 = mat.m02 * s.z;
 		dest.m10 = mat.m10 * s.x;   dest.m11 = mat.m11 * s.y;   dest.m12 = mat.m12 * s.z;
 		dest.m20 = mat.m20 * s.x;   dest.m21 = mat.m21 * s.y;   dest.m22 = mat.m22 * s.z;
 	}
-	
-	public static void absolute(Matrix3f mat) {
+
+	public static void absolute(Matrix3d mat) {
 		mat.m00 = Math.abs(mat.m00);
 		mat.m01 = Math.abs(mat.m01);
 		mat.m02 = Math.abs(mat.m02);
@@ -54,14 +54,14 @@ public class MatrixUtil {
 		mat.m21 = Math.abs(mat.m21);
 		mat.m22 = Math.abs(mat.m22);
 	}
-	
-	public static void setFromOpenGLSubMatrix(Matrix3f mat, float[] m) {
+
+	public static void setFromOpenGLSubMatrix(Matrix3d mat, double[] m) {
 		mat.m00 = m[0]; mat.m01 = m[4]; mat.m02 = m[8];
 		mat.m10 = m[1]; mat.m11 = m[5]; mat.m12 = m[9];
 		mat.m20 = m[2]; mat.m21 = m[6]; mat.m22 = m[10];
 	}
 
-	public static void getOpenGLSubMatrix(Matrix3f mat, float[] m) {
+	public static void getOpenGLSubMatrix(Matrix3d mat, double[] m) {
 		m[0] = mat.m00;
 		m[1] = mat.m10;
 		m[2] = mat.m20;
@@ -75,57 +75,57 @@ public class MatrixUtil {
 		m[10] = mat.m22;
 		m[11] = 0f;
 	}
-	
+
 	/**
 	 * Sets rotation matrix from euler angles. The euler angles are applied in ZYX
 	 * order. This means a vector is first rotated about X then Y and then Z axis.
 	 */
-	public static void setEulerZYX(Matrix3f mat, float eulerX, float eulerY, float eulerZ) {
-		float ci = (float) Math.cos(eulerX);
-		float cj = (float) Math.cos(eulerY);
-		float ch = (float) Math.cos(eulerZ);
-		float si = (float) Math.sin(eulerX);
-		float sj = (float) Math.sin(eulerY);
-		float sh = (float) Math.sin(eulerZ);
-		float cc = ci * ch;
-		float cs = ci * sh;
-		float sc = si * ch;
-		float ss = si * sh;
+	public static void setEulerZYX(Matrix3d mat, double eulerX, double eulerY, double eulerZ) {
+		double ci = (double) Math.cos(eulerX);
+		double cj = (double) Math.cos(eulerY);
+		double ch = (double) Math.cos(eulerZ);
+		double si = (double) Math.sin(eulerX);
+		double sj = (double) Math.sin(eulerY);
+		double sh = (double) Math.sin(eulerZ);
+		double cc = ci * ch;
+		double cs = ci * sh;
+		double sc = si * ch;
+		double ss = si * sh;
 
 		mat.setRow(0, cj * ch, sj * sc - cs, sj * cc + ss);
 		mat.setRow(1, cj * sh, sj * ss + cc, sj * cs - sc);
 		mat.setRow(2, -sj, cj * si, cj * ci);
 	}
-	
-	private static float tdotx(Matrix3f mat, Vector3f vec) {
+
+	private static double tdotx(Matrix3d mat, Vector3d vec) {
 		return mat.m00 * vec.x + mat.m10 * vec.y + mat.m20 * vec.z;
 	}
 
-	private static float tdoty(Matrix3f mat, Vector3f vec) {
+	private static double tdoty(Matrix3d mat, Vector3d vec) {
 		return mat.m01 * vec.x + mat.m11 * vec.y + mat.m21 * vec.z;
 	}
 
-	private static float tdotz(Matrix3f mat, Vector3f vec) {
+	private static double tdotz(Matrix3d mat, Vector3d vec) {
 		return mat.m02 * vec.x + mat.m12 * vec.y + mat.m22 * vec.z;
 	}
-	
-	public static void transposeTransform(Vector3f dest, Vector3f vec, Matrix3f mat) {
-		float x = tdotx(mat, vec);
-		float y = tdoty(mat, vec);
-		float z = tdotz(mat, vec);
+
+	public static void transposeTransform(Vector3d dest, Vector3d vec, Matrix3d mat) {
+		double x = tdotx(mat, vec);
+		double y = tdoty(mat, vec);
+		double z = tdotz(mat, vec);
 		dest.x = x;
 		dest.y = y;
 		dest.z = z;
 	}
-	
-	public static void setRotation(Matrix3f dest, Quat4f q) {
-		float d = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+
+	public static void setRotation(Matrix3d dest, Quat4d q) {
+		double d = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
 		assert (d != 0f);
-		float s = 2f / d;
-		float xs = q.x * s, ys = q.y * s, zs = q.z * s;
-		float wx = q.w * xs, wy = q.w * ys, wz = q.w * zs;
-		float xx = q.x * xs, xy = q.x * ys, xz = q.x * zs;
-		float yy = q.y * ys, yz = q.y * zs, zz = q.z * zs;
+		double s = 2f / d;
+		double xs = q.x * s, ys = q.y * s, zs = q.z * s;
+		double wx = q.w * xs, wy = q.w * ys, wz = q.w * zs;
+		double xx = q.x * xs, xy = q.x * ys, xz = q.x * zs;
+		double yy = q.y * ys, yz = q.y * zs, zz = q.z * zs;
 		dest.m00 = 1f - (yy + zz);
 		dest.m01 = xy - wz;
 		dest.m02 = xz + wy;
@@ -136,15 +136,15 @@ public class MatrixUtil {
 		dest.m21 = yz + wx;
 		dest.m22 = 1f - (xx + yy);
 	}
-	
-	public static void getRotation(Matrix3f mat, Quat4f dest) {
-		ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
-		
-		float trace = mat.m00 + mat.m11 + mat.m22;
-		float[] temp = floatArrays.getFixed(4);
+
+	public static void getRotation(Matrix3d mat, Quat4d dest) {
+		ArrayPool<double[]> doubleArrays = ArrayPool.get(double.class);
+
+		double trace = mat.m00 + mat.m11 + mat.m22;
+		double[] temp = doubleArrays.getFixed(4);
 
 		if (trace > 0f) {
-			float s = (float) Math.sqrt(trace + 1f);
+			double s = (double) Math.sqrt(trace + 1f);
 			temp[3] = (s * 0.5f);
 			s = 0.5f / s;
 
@@ -157,7 +157,7 @@ public class MatrixUtil {
 			int j = (i + 1) % 3;
 			int k = (i + 2) % 3;
 
-			float s = (float) Math.sqrt(mat.getElement(i, i) - mat.getElement(j, j) - mat.getElement(k, k) + 1f);
+			double s = (double) Math.sqrt(mat.getElement(i, i) - mat.getElement(j, j) - mat.getElement(k, k) + 1f);
 			temp[i] = s * 0.5f;
 			s = 0.5f / s;
 
@@ -166,33 +166,33 @@ public class MatrixUtil {
 			temp[k] = (mat.getElement(k, i) + mat.getElement(i, k)) * s;
 		}
 		dest.set(temp[0], temp[1], temp[2], temp[3]);
-		
-		floatArrays.release(temp);
+
+		doubleArrays.release(temp);
 	}
 
-	private static float cofac(Matrix3f mat, int r1, int c1, int r2, int c2) {
+	private static double cofac(Matrix3d mat, int r1, int c1, int r2, int c2) {
 		return mat.getElement(r1, c1) * mat.getElement(r2, c2) - mat.getElement(r1, c2) * mat.getElement(r2, c1);
 	}
-	
-	public static void invert(Matrix3f mat) {
-		float co_x = cofac(mat, 1, 1, 2, 2);
-		float co_y = cofac(mat, 1, 2, 2, 0);
-		float co_z = cofac(mat, 1, 0, 2, 1);
-		
-		float det = mat.m00*co_x + mat.m01*co_y + mat.m02*co_z;
+
+	public static void invert(Matrix3d mat) {
+		double co_x = cofac(mat, 1, 1, 2, 2);
+		double co_y = cofac(mat, 1, 2, 2, 0);
+		double co_z = cofac(mat, 1, 0, 2, 1);
+
+		double det = mat.m00*co_x + mat.m01*co_y + mat.m02*co_z;
 		assert (det != 0f);
-		
-		float s = 1f / det;
-		float m00 = co_x * s;
-		float m01 = cofac(mat, 0, 2, 2, 1) * s;
-		float m02 = cofac(mat, 0, 1, 1, 2) * s;
-		float m10 = co_y * s;
-		float m11 = cofac(mat, 0, 0, 2, 2) * s;
-		float m12 = cofac(mat, 0, 2, 1, 0) * s;
-		float m20 = co_z * s;
-		float m21 = cofac(mat, 0, 1, 2, 0) * s;
-		float m22 = cofac(mat, 0, 0, 1, 1) * s;
-		
+
+		double s = 1f / det;
+		double m00 = co_x * s;
+		double m01 = cofac(mat, 0, 2, 2, 1) * s;
+		double m02 = cofac(mat, 0, 1, 1, 2) * s;
+		double m10 = co_y * s;
+		double m11 = cofac(mat, 0, 0, 2, 2) * s;
+		double m12 = cofac(mat, 0, 2, 1, 0) * s;
+		double m20 = co_z * s;
+		double m21 = cofac(mat, 0, 1, 2, 0) * s;
+		double m22 = cofac(mat, 0, 0, 1, 1) * s;
+
 		mat.m00 = m00;
 		mat.m01 = m01;
 		mat.m02 = m02;
@@ -213,8 +213,8 @@ public class MatrixUtil {
 	 * been executed. Note that this matrix is assumed to be symmetric.
 	 */
 	// JAVA NOTE: diagonalize method from 2.71
-	public static void diagonalize(Matrix3f mat, Matrix3f rot, float threshold, int maxSteps) {
-		Vector3f row = Stack.alloc(Vector3f.class);
+	public static void diagonalize(Matrix3d mat, Matrix3d rot, double threshold, int maxSteps) {
+		Vector3d row = Stack.alloc(Vector3d.class);
 
 		rot.setIdentity();
 		for (int step = maxSteps; step > 0; step--) {
@@ -222,8 +222,8 @@ public class MatrixUtil {
 			int p = 0;
 			int q = 1;
 			int r = 2;
-			float max = Math.abs(mat.m01);
-			float v = Math.abs(mat.m02);
+			double max = Math.abs(mat.m01);
+			double v = Math.abs(mat.m02);
 			if (v > max) {
 				q = 2;
 				r = 1;
@@ -237,7 +237,7 @@ public class MatrixUtil {
 				max = v;
 			}
 
-			float t = threshold * (Math.abs(mat.m00) + Math.abs(mat.m11) + Math.abs(mat.m22));
+			double t = threshold * (Math.abs(mat.m00) + Math.abs(mat.m11) + Math.abs(mat.m22));
 			if (max <= t) {
 				if (max <= BulletGlobals.SIMD_EPSILON * t) {
 					return;
@@ -246,15 +246,15 @@ public class MatrixUtil {
 			}
 
 			// compute Jacobi rotation J which leads to a zero for element [p][q]
-			float mpq = mat.getElement(p, q);
-			float theta = (mat.getElement(q, q) - mat.getElement(p, p)) / (2 * mpq);
-			float theta2 = theta * theta;
-			float cos;
-			float sin;
+			double mpq = mat.getElement(p, q);
+			double theta = (mat.getElement(q, q) - mat.getElement(p, p)) / (2 * mpq);
+			double theta2 = theta * theta;
+			double cos;
+			double sin;
 			if ((theta2 * theta2) < (10f / BulletGlobals.SIMD_EPSILON)) {
-				t = (theta >= 0f) ? 1f / (theta + (float) Math.sqrt(1f + theta2))
-						: 1f / (theta - (float) Math.sqrt(1f + theta2));
-				cos = 1f / (float) Math.sqrt(1f + t * t);
+				t = (theta >= 0f) ? 1f / (theta + (double) Math.sqrt(1f + theta2))
+						: 1f / (theta - (double) Math.sqrt(1f + theta2));
+				cos = 1f / (double) Math.sqrt(1f + t * t);
 				sin = cos * t;
 			}
 			else {
@@ -269,8 +269,8 @@ public class MatrixUtil {
 			mat.setElement(q, p, 0f);
 			mat.setElement(p, p, mat.getElement(p, p) - t * mpq);
 			mat.setElement(q, q, mat.getElement(q, q) + t * mpq);
-			float mrp = mat.getElement(r, p);
-			float mrq = mat.getElement(r, q);
+			double mrp = mat.getElement(r, p);
+			double mrq = mat.getElement(r, q);
 			mat.setElement(r, p, cos * mrp - sin * mrq);
 			mat.setElement(p, r, cos * mrp - sin * mrq);
 			mat.setElement(r, q, cos * mrq + sin * mrp);
@@ -288,5 +288,5 @@ public class MatrixUtil {
 			}
 		}
 	}
-	
+
 }

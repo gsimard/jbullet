@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -27,7 +27,7 @@
 
 package com.bulletphysics.extras.gimpact;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -35,12 +35,12 @@ import javax.vecmath.Vector3f;
  */
 class GImpactMassUtil {
 
-	public static Vector3f get_point_inertia(Vector3f point, float mass, Vector3f out) {
-		float x2 = point.x * point.x;
-		float y2 = point.y * point.y;
-		float z2 = point.z * point.z;
+	public static Vector3d get_point_inertia(Vector3d point, double mass, Vector3d out) {
+		double x2 = point.x * point.x;
+		double y2 = point.y * point.y;
+		double z2 = point.z * point.z;
 		out.set(mass * (y2 + z2), mass * (x2 + z2), mass * (x2 + y2));
 		return out;
 	}
-	
+
 }

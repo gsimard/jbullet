@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -30,7 +30,7 @@ package com.bulletphysics.extras.gimpact;
 import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -40,20 +40,20 @@ class BvhTree {
 
 	protected int num_nodes = 0;
 	protected BvhTreeNodeArray node_array = new BvhTreeNodeArray();
-	
+
 	protected int _calc_splitting_axis(BvhDataArray primitive_boxes, int startIndex, int endIndex) {
-		Vector3f means = Stack.alloc(Vector3f.class);
+		Vector3d means = Stack.alloc(Vector3d.class);
 		means.set(0f, 0f, 0f);
-		Vector3f variance = Stack.alloc(Vector3f.class);
+		Vector3d variance = Stack.alloc(Vector3d.class);
 		variance.set(0f, 0f, 0f);
 
 		int numIndices = endIndex - startIndex;
 
-		Vector3f center = Stack.alloc(Vector3f.class);
-		Vector3f diff2 = Stack.alloc(Vector3f.class);
+		Vector3d center = Stack.alloc(Vector3d.class);
+		Vector3d diff2 = Stack.alloc(Vector3d.class);
 
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
 		for (int i=startIndex; i<endIndex; i++) {
 			primitive_boxes.getBoundMax(i, tmp1);
@@ -62,7 +62,7 @@ class BvhTree {
 			center.scale(0.5f);
 			means.add(center);
 		}
-		means.scale(1f / (float)numIndices);
+		means.scale(1f / (double)numIndices);
 
 		for (int i=startIndex; i<endIndex; i++) {
 			primitive_boxes.getBoundMax(i, tmp1);
@@ -73,7 +73,7 @@ class BvhTree {
 			VectorUtil.mul(diff2, diff2, diff2);
 			variance.add(diff2);
 		}
-		variance.scale(1f / (float)(numIndices - 1));
+		variance.scale(1f / (double)(numIndices - 1));
 
 		return VectorUtil.maxAxis(variance);
 	}
@@ -83,15 +83,15 @@ class BvhTree {
 		int numIndices = endIndex - startIndex;
 
 		// average of centers
-		float splitValue = 0.0f;
+		double splitValue = 0.0f;
 
-		Vector3f means = Stack.alloc(Vector3f.class);
+		Vector3d means = Stack.alloc(Vector3d.class);
 		means.set(0f, 0f, 0f);
 
-		Vector3f center = Stack.alloc(Vector3f.class);
+		Vector3d center = Stack.alloc(Vector3d.class);
 
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
 
 		for (int i = startIndex; i < endIndex; i++) {
 			primitive_boxes.getBoundMax(i, tmp1);
@@ -100,7 +100,7 @@ class BvhTree {
 			center.scale(0.5f);
 			means.add(center);
 		}
-		means.scale(1f / (float) numIndices);
+		means.scale(1f / (double) numIndices);
 
 		splitValue = VectorUtil.getCoord(means, splitAxis);
 
@@ -184,7 +184,7 @@ class BvhTree {
 
 		node_array.setEscapeIndex(curIndex, num_nodes - curIndex);
 	}
-	
+
 	public void build_tree(BvhDataArray primitive_boxes) {
 		// initialize node count to 0
 		num_nodes = 0;
@@ -240,5 +240,5 @@ class BvhTree {
 	public BvhTreeNodeArray get_node_pointer() {
 		return node_array;
 	}
-	
+
 }

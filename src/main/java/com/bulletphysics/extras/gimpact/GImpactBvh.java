@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -32,7 +32,7 @@ import com.bulletphysics.extras.gimpact.BoxCollision.BoxBoxTransformCache;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.IntArrayList;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -42,7 +42,7 @@ class GImpactBvh {
 
 	protected BvhTree box_tree = new BvhTree();
 	protected PrimitiveManagerBase primitive_manager;
-	
+
 	/**
 	 * This constructor doesn't build the tree. you must call buildSet.
 	 */
@@ -69,7 +69,7 @@ class GImpactBvh {
 	public PrimitiveManagerBase getPrimitiveManager() {
 		return primitive_manager;
 	}
-	
+
 	// stackless refit
 	protected void refit() {
 		AABB leafbox = Stack.alloc(AABB.class);
@@ -181,7 +181,7 @@ class GImpactBvh {
 	/**
 	 * Returns the indices of the primitives in the primitive_manager field.
 	 */
-	public boolean rayQuery(Vector3f ray_dir, Vector3f ray_origin, IntArrayList collided_results) {
+	public boolean rayQuery(Vector3d ray_dir, Vector3d ray_origin, IntArrayList collided_results) {
 		int curIndex = 0;
 		int numNodes = getNodeCount();
 
@@ -220,18 +220,18 @@ class GImpactBvh {
 	public boolean hasHierarchy() {
 		return true;
 	}
-	
+
 	/**
 	 * Tells if this set is a trimesh.
 	 */
 	public boolean isTrimesh() {
 		return primitive_manager.is_trimesh();
 	}
-	
+
 	public int getNodeCount() {
 		return box_tree.getNodeCount();
 	}
-	
+
 	/**
 	 * Tells if the node is a leaf.
 	 */
@@ -281,7 +281,7 @@ class GImpactBvh {
 		//box1.appy_transform_trans_cache(trans_cache_1to0);
 		//return box0.has_collision(box1);
 	}
-	
+
 	/**
 	 * Stackless recursive collision routine.
 	 */
@@ -354,8 +354,8 @@ class GImpactBvh {
 			} // else if node1 is not a leaf
 		} // else if node0 is not a leaf
 	}
-	
-	//public static float getAverageTreeCollisionTime();
+
+	//public static double getAverageTreeCollisionTime();
 
 	public static void find_collision(GImpactBvh boxset0, Transform trans0, GImpactBvh boxset1, Transform trans1, PairSet collision_pairs) {
 		if (boxset0.getNodeCount() == 0 || boxset1.getNodeCount() == 0) {
@@ -377,5 +377,5 @@ class GImpactBvh {
 		//bt_end_gim02_tree_time();
 		//#endif //TRI_COLLISION_PROFILING
 	}
-	
+
 }

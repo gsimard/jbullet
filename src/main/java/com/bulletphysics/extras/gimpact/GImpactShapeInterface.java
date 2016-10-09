@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -35,18 +35,18 @@ import com.bulletphysics.collision.shapes.TriangleCallback;
 import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
 import com.bulletphysics.linearmath.Transform;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * Base class for gimpact shapes.
- * 
+ *
  * @author jezek2
  */
 public abstract class GImpactShapeInterface extends ConcaveShape {
 
     protected AABB localAABB = new AABB();
     protected boolean needs_update;
-    protected final Vector3f localScaling = new Vector3f();
+    protected final Vector3d localScaling = new Vector3d();
     GImpactBvh box_set = new GImpactBvh(); // optionally boxset
 
 	public GImpactShapeInterface() {
@@ -58,10 +58,10 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	/**
 	 * Performs refit operation.<p>
 	 * Updates the entire Box set of this shape.<p>
-	 * 
+	 *
 	 * postUpdate() must be called for attemps to calculating the box set, else this function
 	 * will does nothing.<p>
-	 * 
+	 *
 	 * if m_needs_update == true, then it calls calcLocalAABB();
 	 */
 	public void updateBound() {
@@ -77,7 +77,7 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
      * Calls updateBound() for update the box set.
      */
 	@Override
-	public void getAabb(Transform t, Vector3f aabbMin, Vector3f aabbMax) {
+	public void getAabb(Transform t, Vector3d aabbMin, Vector3d aabbMax) {
 		AABB transformedbox = Stack.alloc(localAABB);
 		transformedbox.appy_transform(t);
 		aabbMin.set(transformedbox.min);
@@ -90,7 +90,7 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	public void postUpdate() {
 		needs_update = true;
 	}
-	
+
 	/**
 	 * Obtains the local box, which is the global calculated box of the total of subshapes.
 	 */
@@ -108,19 +108,19 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	 * You must call updateBound() for update the box set.
 	 */
 	@Override
-	public void setLocalScaling(Vector3f scaling) {
+	public void setLocalScaling(Vector3d scaling) {
 		localScaling.set(scaling);
 		postUpdate();
 	}
 
 	@Override
-	public Vector3f getLocalScaling(Vector3f out) {
+	public Vector3d getLocalScaling(Vector3d out) {
 		out.set(localScaling);
 		return out;
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public void setMargin(double margin) {
 		collisionMargin = margin;
 		int i = getNumChildShapes();
 		while ((i--) != 0) {
@@ -135,7 +135,7 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	 * Base method for determinig which kind of GIMPACT shape we get.
 	 */
 	abstract ShapeType getGImpactShapeType();
-	
+
 	GImpactBvh getBoxSet() {
 		return box_set;
 	}
@@ -187,14 +187,14 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 
 	public void unlockChildShapes() {
 	}
-	
+
 	/**
 	 * If this trimesh.
 	 */
 	void getPrimitiveTriangle(int index, PrimitiveTriangle triangle) {
 		getPrimitiveManager().get_primitive_triangle(index, triangle);
 	}
-	
+
 	/**
 	 * Use this function for perfofm refit in bounding boxes.
 	 */
@@ -210,11 +210,11 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 
 		box_set.getGlobalBox(localAABB);
 	}
-	
+
 	/**
 	 * Retrieves the bound from a child.
 	 */
-	public void getChildAabb(int child_index, Transform t, Vector3f aabbMin, Vector3f aabbMax) {
+	public void getChildAabb(int child_index, Transform t, Vector3d aabbMin, Vector3d aabbMax) {
 		AABB child_aabb = Stack.alloc(AABB.class);
 		getPrimitiveManager().get_primitive_box(child_index, child_aabb);
 		child_aabb.appy_transform(t);
@@ -226,7 +226,7 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	 * Gets the children.
 	 */
 	public abstract CollisionShape getChildShape(int index);
-	
+
 	/**
 	 * Gets the children transform.
 	 */
@@ -241,14 +241,14 @@ public abstract class GImpactShapeInterface extends ConcaveShape {
 	/**
 	 * Virtual method for ray collision.
 	 */
-	public void rayTest(Vector3f rayFrom, Vector3f rayTo, RayResultCallback resultCallback) {
+	public void rayTest(Vector3d rayFrom, Vector3d rayTo, RayResultCallback resultCallback) {
 	}
-	
+
 	/**
 	 * Function for retrieve triangles. It gives the triangles in local space.
 	 */
 	@Override
-	public void processAllTriangles(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
+	public void processAllTriangles(TriangleCallback callback, Vector3d aabbMin, Vector3d aabbMax) {
 	}
-	
+
 }

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -35,7 +35,7 @@ import com.bulletphysics.BulletStats;
 
 /**
  * Manager for the profile system.
- * 
+ *
  * @author jezek2
  */
 public class CProfileManager {
@@ -55,7 +55,7 @@ public class CProfileManager {
 
 		currentNode.call();
 	}
-	
+
 	public static void stopProfile() {
 		// Return will indicate whether we should back up to our parent (we may
 		// be profiling a recursive function)
@@ -74,27 +74,27 @@ public class CProfileManager {
 		frameCounter = 0;
 		resetTime = BulletStats.profileGetTicks();
 	}
-	
+
 	public static void incrementFrameCounter() {
 		frameCounter++;
 	}
-	
+
 	public static int getFrameCountSinceReset() {
 		return frameCounter;
 	}
-	
-	public static float getTimeSinceReset() {
+
+	public static double getTimeSinceReset() {
 		long time = BulletStats.profileGetTicks();
 		time -= resetTime;
-		return (float) time / BulletStats.profileGetTickRate();
+		return (double) time / BulletStats.profileGetTickRate();
 	}
 
 	public static CProfileIterator getIterator() {
 		return new CProfileIterator(root);
 	}
-	
+
 	public static void releaseIterator(CProfileIterator iterator) {
 		/*delete ( iterator);*/
 	}
-	
+
 }

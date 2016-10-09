@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -28,19 +28,19 @@ import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Vector3d;
 
 /**
  * Concave triangle mesh abstract class. Use {@link BvhTriangleMeshShape} as concrete
  * implementation.
- * 
+ *
  * @author jezek2
  */
 public abstract class TriangleMeshShape extends ConcaveShape {
 
-	protected final Vector3f localAabbMin = new Vector3f();
-	protected final Vector3f localAabbMax = new Vector3f();
+	protected final Vector3d localAabbMin = new Vector3d();
+	protected final Vector3d localAabbMax = new Vector3d();
 	protected StridingMeshInterface meshInterface;
 
 	/**
@@ -49,22 +49,22 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 	 */
 	protected TriangleMeshShape(StridingMeshInterface meshInterface) {
 		this.meshInterface = meshInterface;
-		
+
 		// JAVA NOTE: moved to BvhTriangleMeshShape
 		//recalcLocalAabb();
 	}
-	
-	public Vector3f localGetSupportingVertex(Vector3f vec, Vector3f out) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
 
-		Vector3f supportVertex = out;
+	public Vector3d localGetSupportingVertex(Vector3d vec, Vector3d out) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
+
+		Vector3d supportVertex = out;
 
 		Transform ident = Stack.alloc(Transform.class);
 		ident.setIdentity();
 
 		SupportVertexCallback supportCallback = new SupportVertexCallback(vec, ident);
 
-		Vector3f aabbMax = Stack.alloc(Vector3f.class);
+		Vector3d aabbMax = Stack.alloc(Vector3d.class);
 		aabbMax.set(1e30f, 1e30f, 1e30f);
 		tmp.negate(aabbMax);
 
@@ -75,17 +75,17 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 		return out;
 	}
 
-	public Vector3f localGetSupportingVertexWithoutMargin(Vector3f vec, Vector3f out) {
+	public Vector3d localGetSupportingVertexWithoutMargin(Vector3d vec, Vector3d out) {
 		assert (false);
 		return localGetSupportingVertex(vec, out);
 	}
 
 	public void recalcLocalAabb() {
 		for (int i = 0; i < 3; i++) {
-			Vector3f vec = Stack.alloc(Vector3f.class);
+			Vector3d vec = Stack.alloc(Vector3d.class);
 			vec.set(0f, 0f, 0f);
 			VectorUtil.setCoord(vec, i, 1f);
-			Vector3f tmp = localGetSupportingVertex(vec, Stack.alloc(Vector3f.class));
+			Vector3d tmp = localGetSupportingVertex(vec, Stack.alloc(Vector3d.class));
 			VectorUtil.setCoord(localAabbMax, i, VectorUtil.getCoord(tmp, i) + collisionMargin);
 			VectorUtil.setCoord(vec, i, -1f);
 			localGetSupportingVertex(vec, tmp);
@@ -94,24 +94,24 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 	}
 
 	@Override
-	public void getAabb(Transform trans, Vector3f aabbMin, Vector3f aabbMax) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+	public void getAabb(Transform trans, Vector3d aabbMin, Vector3d aabbMax) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 
-		Vector3f localHalfExtents = Stack.alloc(Vector3f.class);
+		Vector3d localHalfExtents = Stack.alloc(Vector3d.class);
 		localHalfExtents.sub(localAabbMax, localAabbMin);
 		localHalfExtents.scale(0.5f);
 
-		Vector3f localCenter = Stack.alloc(Vector3f.class);
+		Vector3d localCenter = Stack.alloc(Vector3d.class);
 		localCenter.add(localAabbMax, localAabbMin);
 		localCenter.scale(0.5f);
 
-		Matrix3f abs_b = Stack.alloc(trans.basis);
+		Matrix3d abs_b = Stack.alloc(trans.basis);
 		MatrixUtil.absolute(abs_b);
 
-		Vector3f center = Stack.alloc(localCenter);
+		Vector3d center = Stack.alloc(localCenter);
 		trans.transform(center);
 
-		Vector3f extent = Stack.alloc(Vector3f.class);
+		Vector3d extent = Stack.alloc(Vector3d.class);
 		abs_b.getRow(0, tmp);
 		extent.x = tmp.dot(localHalfExtents);
 		abs_b.getRow(1, tmp);
@@ -119,7 +119,7 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 		abs_b.getRow(2, tmp);
 		extent.z = tmp.dot(localHalfExtents);
 
-		Vector3f margin = Stack.alloc(Vector3f.class);
+		Vector3d margin = Stack.alloc(Vector3d.class);
 		margin.set(getMargin(), getMargin(), getMargin());
 		extent.add(margin);
 
@@ -128,14 +128,14 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 	}
 
 	@Override
-	public void processAllTriangles(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
+	public void processAllTriangles(TriangleCallback callback, Vector3d aabbMin, Vector3d aabbMax) {
 		FilteredCallback filterCallback = new FilteredCallback(callback, aabbMin, aabbMax);
 
 		meshInterface.internalProcessAllTriangles(filterCallback, aabbMin, aabbMax);
 	}
 
 	@Override
-	public void calculateLocalInertia(float mass, Vector3f inertia) {
+	public void calculateLocalInertia(double mass, Vector3d inertia) {
 		// moving concave objects not supported
 		assert (false);
 		inertia.set(0f, 0f, 0f);
@@ -143,26 +143,26 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 
 
 	@Override
-	public void setLocalScaling(Vector3f scaling) {
+	public void setLocalScaling(Vector3d scaling) {
 		meshInterface.setScaling(scaling);
 		recalcLocalAabb();
 	}
 
 	@Override
-	public Vector3f getLocalScaling(Vector3f out) {
+	public Vector3d getLocalScaling(Vector3d out) {
 		return meshInterface.getScaling(out);
 	}
-	
+
 	public StridingMeshInterface getMeshInterface() {
 		return meshInterface;
 	}
 
-	public Vector3f getLocalAabbMin(Vector3f out) {
+	public Vector3d getLocalAabbMin(Vector3d out) {
 		out.set(localAabbMin);
 		return out;
 	}
 
-	public Vector3f getLocalAabbMax(Vector3f out) {
+	public Vector3d getLocalAabbMax(Vector3d out) {
 		out.set(localAabbMax);
 		return out;
 	}
@@ -171,23 +171,23 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 	public String getName() {
 		return "TRIANGLEMESH";
 	}
-	
-	////////////////////////////////////////////////////////////////////////////
-	
-	private class SupportVertexCallback extends TriangleCallback {
-		private final Vector3f supportVertexLocal = new Vector3f(0f, 0f, 0f);
-		public final Transform worldTrans = new Transform();
-		public float maxDot = -1e30f;
-		public final Vector3f supportVecLocal = new Vector3f();
 
-		public SupportVertexCallback(Vector3f supportVecWorld,Transform trans) {
+	////////////////////////////////////////////////////////////////////////////
+
+	private class SupportVertexCallback extends TriangleCallback {
+		private final Vector3d supportVertexLocal = new Vector3d(0f, 0f, 0f);
+		public final Transform worldTrans = new Transform();
+		public double maxDot = -1e30f;
+		public final Vector3d supportVecLocal = new Vector3d();
+
+		public SupportVertexCallback(Vector3d supportVecWorld,Transform trans) {
 			this.worldTrans.set(trans);
 			MatrixUtil.transposeTransform(supportVecLocal, supportVecWorld, worldTrans.basis);
 		}
-		
-		public void processTriangle(Vector3f[] triangle, int partId, int triangleIndex) {
+
+		public void processTriangle(Vector3d[] triangle, int partId, int triangleIndex) {
 			for (int i = 0; i < 3; i++) {
-				float dot = supportVecLocal.dot(triangle[i]);
+				double dot = supportVecLocal.dot(triangle[i]);
 				if (dot > maxDot) {
 					maxDot = dot;
 					supportVertexLocal.set(triangle[i]);
@@ -195,30 +195,30 @@ public abstract class TriangleMeshShape extends ConcaveShape {
 			}
 		}
 
-		public Vector3f getSupportVertexWorldSpace(Vector3f out) {
+		public Vector3d getSupportVertexWorldSpace(Vector3d out) {
 			out.set(supportVertexLocal);
 			worldTrans.transform(out);
 			return out;
 		}
 
-		public Vector3f getSupportVertexLocal(Vector3f out) {
+		public Vector3d getSupportVertexLocal(Vector3d out) {
 			out.set(supportVertexLocal);
 			return out;
 		}
 	}
-	
+
 	private static class FilteredCallback extends InternalTriangleIndexCallback {
 		public TriangleCallback callback;
-		public final Vector3f aabbMin = new Vector3f();
-		public final Vector3f aabbMax = new Vector3f();
+		public final Vector3d aabbMin = new Vector3d();
+		public final Vector3d aabbMax = new Vector3d();
 
-		public FilteredCallback(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
+		public FilteredCallback(TriangleCallback callback, Vector3d aabbMin, Vector3d aabbMax) {
 			this.callback = callback;
 			this.aabbMin.set(aabbMin);
 			this.aabbMax.set(aabbMax);
 		}
 
-		public void internalProcessTriangleIndex(Vector3f[] triangle, int partId, int triangleIndex) {
+		public void internalProcessTriangleIndex(Vector3d[] triangle, int partId, int triangleIndex) {
 			if (AabbUtil2.testTriangleAgainstAabb2(triangle, aabbMin, aabbMax)) {
 				// check aabb in triangle-space, before doing this
 				callback.processTriangle(triangle, partId, triangleIndex);

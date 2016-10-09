@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -23,7 +23,7 @@
 
 package com.bulletphysics.collision.narrowphase;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
@@ -31,17 +31,17 @@ import javax.vecmath.Vector3f;
  */
 public class PointCollector extends DiscreteCollisionDetectorInterface.Result {
 
-	public final Vector3f normalOnBInWorld = new Vector3f();
-	public final Vector3f pointInWorld = new Vector3f();
-	public float distance = 1e30f; // negative means penetration
+	public final Vector3d normalOnBInWorld = new Vector3d();
+	public final Vector3d pointInWorld = new Vector3d();
+	public double distance = 1e30f; // negative means penetration
 
 	public boolean hasResult = false;
-	
+
 	public void setShapeIdentifiers(int partId0, int index0, int partId1, int index1) {
 		// ??
 	}
 
-	public void addContactPoint(Vector3f normalOnBInWorld, Vector3f pointInWorld, float depth) {
+	public void addContactPoint(Vector3d normalOnBInWorld, Vector3d pointInWorld, double depth) {
 		if (depth < distance) {
 			hasResult = true;
 			this.normalOnBInWorld.set(normalOnBInWorld);

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -23,37 +23,37 @@
 
 package com.bulletphysics.dynamics.constraintsolver;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * 1D constraint along a normal axis between bodyA and bodyB. It can be combined
  * to solve contact and friction constraints.
- * 
+ *
  * @author jezek2
  */
 public class SolverConstraint {
 
-	public final Vector3f relpos1CrossNormal = new Vector3f();
-	public final Vector3f contactNormal = new Vector3f();
+	public final Vector3d relpos1CrossNormal = new Vector3d();
+	public final Vector3d contactNormal = new Vector3d();
 
-	public final Vector3f relpos2CrossNormal = new Vector3f();
-	public final Vector3f angularComponentA = new Vector3f();
+	public final Vector3d relpos2CrossNormal = new Vector3d();
+	public final Vector3d angularComponentA = new Vector3d();
 
-	public final Vector3f angularComponentB = new Vector3f();
-	
-	public float appliedPushImpulse;
-	
-	public float appliedImpulse;
+	public final Vector3d angularComponentB = new Vector3d();
+
+	public double appliedPushImpulse;
+
+	public double appliedImpulse;
 	public int solverBodyIdA;
 	public int solverBodyIdB;
-	
-	public float friction;
-	public float restitution;
-	public float jacDiagABInv;
-	public float penetration;
-	
+
+	public double friction;
+	public double restitution;
+	public double jacDiagABInv;
+	public double penetration;
+
 	public SolverConstraintType constraintType;
 	public int frictionIndex;
 	public Object originalContactPoint;
-	
+
 }

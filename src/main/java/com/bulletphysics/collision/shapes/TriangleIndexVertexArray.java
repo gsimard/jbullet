@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -29,10 +29,10 @@ import java.nio.ByteBuffer;
 /**
  * TriangleIndexVertexArray allows to use multiple meshes, by indexing into existing
  * triangle/index arrays. Additional meshes can be added using {@link #addIndexedMesh addIndexedMesh}.<p>
- * 
+ *
  * No duplicate is made of the vertex/index data, it only indexes into external vertex/index
  * arrays. So keep those arrays around during the lifetime of this TriangleIndexVertexArray.
- * 
+ *
  * @author jezek2
  */
 public class TriangleIndexVertexArray extends StridingMeshInterface {
@@ -68,7 +68,7 @@ public class TriangleIndexVertexArray extends StridingMeshInterface {
 		indexedMeshes.add(mesh);
 		indexedMeshes.getQuick(indexedMeshes.size() - 1).indexType = indexType;
 	}
-	
+
 	@Override
 	public VertexData getLockedVertexIndexBase(int subpart) {
 		assert (subpart < getNumSubParts());
@@ -80,7 +80,7 @@ public class TriangleIndexVertexArray extends StridingMeshInterface {
 		//#ifdef BT_USE_DOUBLE_PRECISION
 		//type = PHY_DOUBLE;
 		//#else
-		data.vertexType = ScalarType.FLOAT;
+		data.vertexType = ScalarType.DOUBLE;
 		//#endif
 		data.vertexStride = mesh.vertexStride;
 
@@ -124,7 +124,7 @@ public class TriangleIndexVertexArray extends StridingMeshInterface {
 	public ObjectArrayList<IndexedMesh> getIndexedMeshArray() {
 		return indexedMeshes;
 	}
-	
+
 	@Override
 	public void preallocateVertices(int numverts) {
 	}

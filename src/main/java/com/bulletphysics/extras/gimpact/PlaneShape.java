@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -31,8 +31,8 @@ import com.bulletphysics.collision.shapes.StaticPlaneShape;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4d;
 
 /**
  *
@@ -40,27 +40,27 @@ import javax.vecmath.Vector4f;
  */
 class PlaneShape {
 
-	public static void get_plane_equation(StaticPlaneShape shape, Vector4f equation) {
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+	public static void get_plane_equation(StaticPlaneShape shape, Vector4d equation) {
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 		equation.set(shape.getPlaneNormal(tmp));
 		equation.w = shape.getPlaneConstant();
 	}
-	
-	public static void get_plane_equation_transformed(StaticPlaneShape shape, Transform trans, Vector4f equation) {
+
+	public static void get_plane_equation_transformed(StaticPlaneShape shape, Transform trans, Vector4d equation) {
 		get_plane_equation(shape, equation);
 
-		Vector3f tmp = Stack.alloc(Vector3f.class);
+		Vector3d tmp = Stack.alloc(Vector3d.class);
 
 		trans.basis.getRow(0, tmp);
-		float x = VectorUtil.dot3(tmp, equation);
+		double x = VectorUtil.dot3(tmp, equation);
 		trans.basis.getRow(1, tmp);
-		float y = VectorUtil.dot3(tmp, equation);
+		double y = VectorUtil.dot3(tmp, equation);
 		trans.basis.getRow(2, tmp);
-		float z = VectorUtil.dot3(tmp, equation);
+		double z = VectorUtil.dot3(tmp, equation);
 
-		float w = VectorUtil.dot3(trans.origin, equation) + equation.w;
+		double w = VectorUtil.dot3(trans.origin, equation) + equation.w;
 
 		equation.set(x, y, z, w);
 	}
-	
+
 }

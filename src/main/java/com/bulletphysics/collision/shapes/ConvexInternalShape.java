@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -28,35 +28,35 @@ import com.bulletphysics.linearmath.MatrixUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.linearmath.VectorUtil;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * ConvexInternalShape is an internal base class, shared by most convex shape implementations.
- * 
+ *
  * @author jezek2
  */
 public abstract class ConvexInternalShape extends ConvexShape {
 
 	// local scaling. collisionMargin is not scaled !
-	protected final Vector3f localScaling = new Vector3f(1f, 1f, 1f);
-	protected final Vector3f implicitShapeDimensions = new Vector3f();
-	protected float collisionMargin = BulletGlobals.CONVEX_DISTANCE_MARGIN;
+	protected final Vector3d localScaling = new Vector3d(1f, 1f, 1f);
+	protected final Vector3d implicitShapeDimensions = new Vector3d();
+	protected double collisionMargin = BulletGlobals.CONVEX_DISTANCE_MARGIN;
 
 	/**
 	 * getAabb's default implementation is brute force, expected derived classes to implement a fast dedicated version.
 	 */
 	@Override
-	public void getAabb(Transform t, Vector3f aabbMin, Vector3f aabbMax) {
+	public void getAabb(Transform t, Vector3d aabbMin, Vector3d aabbMax) {
 		getAabbSlow(t, aabbMin, aabbMax);
 	}
-	
+
 	@Override
-	public void getAabbSlow(Transform trans, Vector3f minAabb, Vector3f maxAabb) {
-		float margin = getMargin();
-		Vector3f vec = Stack.alloc(Vector3f.class);
-		Vector3f tmp1 = Stack.alloc(Vector3f.class);
-		Vector3f tmp2 = Stack.alloc(Vector3f.class);
-		
+	public void getAabbSlow(Transform trans, Vector3d minAabb, Vector3d maxAabb) {
+		double margin = getMargin();
+		Vector3d vec = Stack.alloc(Vector3d.class);
+		Vector3d tmp1 = Stack.alloc(Vector3d.class);
+		Vector3d tmp2 = Stack.alloc(Vector3d.class);
+
 		for (int i=0;i<3;i++)
 		{
 			vec.set(0f, 0f, 0f);
@@ -64,7 +64,7 @@ public abstract class ConvexInternalShape extends ConvexShape {
 
 			MatrixUtil.transposeTransform(tmp1, vec, trans.basis);
 			localGetSupportingVertex(tmp1, tmp2);
-			
+
 			trans.transform(tmp2);
 
 			VectorUtil.setCoord(maxAabb, i, VectorUtil.getCoord(tmp2, i) + margin);
@@ -80,11 +80,11 @@ public abstract class ConvexInternalShape extends ConvexShape {
 	}
 
 	@Override
-	public Vector3f localGetSupportingVertex(Vector3f vec, Vector3f out) {
-		Vector3f supVertex = localGetSupportingVertexWithoutMargin(vec, out);
+	public Vector3d localGetSupportingVertex(Vector3d vec, Vector3d out) {
+		Vector3d supVertex = localGetSupportingVertexWithoutMargin(vec, out);
 
 		if (getMargin() != 0f) {
-			Vector3f vecnorm = Stack.alloc(vec);
+			Vector3d vecnorm = Stack.alloc(vec);
 			if (vecnorm.lengthSquared() < (BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON)) {
 				vecnorm.set(-1f, -1f, -1f);
 			}
@@ -93,21 +93,21 @@ public abstract class ConvexInternalShape extends ConvexShape {
 		}
 		return out;
 	}
-	
-	public void setLocalScaling(Vector3f scaling) {
+
+	public void setLocalScaling(Vector3d scaling) {
 		localScaling.absolute(scaling);
 	}
-	
-	public Vector3f getLocalScaling(Vector3f out) {
+
+	public Vector3d getLocalScaling(Vector3d out) {
 		out.set(localScaling);
 		return out;
 	}
 
-	public float getMargin() {
+	public double getMargin() {
 		return collisionMargin;
 	}
 
-	public void setMargin(float margin) {
+	public void setMargin(double margin) {
 		this.collisionMargin = margin;
 	}
 
@@ -117,8 +117,8 @@ public abstract class ConvexInternalShape extends ConvexShape {
 	}
 
 	@Override
-	public void getPreferredPenetrationDirection(int index, Vector3f penetrationVector) {
+	public void getPreferredPenetrationDirection(int index, Vector3d penetrationVector) {
 		throw new InternalError();
 	}
-	
+
 }

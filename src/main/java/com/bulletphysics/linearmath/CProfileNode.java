@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -35,17 +35,17 @@ import com.bulletphysics.BulletStats;
 
 /**
  * A node in the Profile Hierarchy Tree.
- * 
+ *
  * @author jezek2
  */
 class CProfileNode {
 
 	protected String name;
 	protected int totalCalls;
-	protected float totalTime;
+	protected double totalTime;
 	protected long startTime;
 	protected int recursionCounter;
-	
+
 	protected CProfileNode parent;
 	protected CProfileNode child;
 	protected CProfileNode sibling;
@@ -59,7 +59,7 @@ class CProfileNode {
 		this.parent = parent;
 		this.child = null;
 		this.sibling = null;
-		
+
 		reset();
 	}
 
@@ -97,7 +97,7 @@ class CProfileNode {
 		child = null;
 		sibling = null;
 	}
-	
+
 	public void reset() {
 		totalCalls = 0;
 		totalTime = 0.0f;
@@ -110,19 +110,19 @@ class CProfileNode {
 			sibling.reset();
 		}
 	}
-	
+
 	public void call() {
 		totalCalls++;
 		if (recursionCounter++ == 0) {
 			startTime = BulletStats.profileGetTicks();
 		}
 	}
-	
+
 	public boolean Return() {
 		if (--recursionCounter == 0 && totalCalls != 0) {
 			long time = BulletStats.profileGetTicks();
 			time -= startTime;
-			totalTime += (float) time / BulletStats.profileGetTickRate();
+			totalTime += (double) time / BulletStats.profileGetTickRate();
 		}
 		return (recursionCounter == 0);
 	}
@@ -130,13 +130,13 @@ class CProfileNode {
 	public String getName() {
 		return name;
 	}
-	
+
 	public int getTotalCalls() {
 		return totalCalls;
 	}
 
-	public float getTotalTime() {
+	public double getTotalTime() {
 		return totalTime;
 	}
-	
+
 }

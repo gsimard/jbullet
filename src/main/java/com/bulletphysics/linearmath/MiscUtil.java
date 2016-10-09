@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -24,13 +24,13 @@
 package com.bulletphysics.linearmath;
 
 import java.util.Comparator;
-import com.bulletphysics.util.FloatArrayList;
+import com.bulletphysics.util.DoubleArrayList;
 import com.bulletphysics.util.IntArrayList;
 import com.bulletphysics.util.ObjectArrayList;
 
 /**
  * Miscellaneous utility functions.
- * 
+ *
  * @author jezek2
  */
 public class MiscUtil {
@@ -38,7 +38,7 @@ public class MiscUtil {
 	public static int getListCapacityForHash(ObjectArrayList<?> list) {
 		return getListCapacityForHash(list.size());
 	}
-	
+
 	public static int getListCapacityForHash(int size) {
 		int n = 2;
 		while (n < size) {
@@ -56,7 +56,7 @@ public class MiscUtil {
 			list.add(value);
 		}
 	}
-	
+
 	/**
 	 * Resizes list to exact size, filling with given value when expanding.
 	 */
@@ -64,25 +64,25 @@ public class MiscUtil {
 		while (list.size() < size) {
 			list.add(value);
 		}
-		
+
 		while (list.size() > size) {
 			list.remove(list.size() - 1);
 		}
 	}
-	
+
 	/**
 	 * Resizes list to exact size, filling with given value when expanding.
 	 */
-	public static void resize(FloatArrayList list, int size, float value) {
+	public static void resize(DoubleArrayList list, int size, double value) {
 		while (list.size() < size) {
 			list.add(value);
 		}
-		
+
 		while (list.size() > size) {
 			list.remove(list.size() - 1);
 		}
 	}
-	
+
 	/**
 	 * Resizes list to exact size, filling with new instances of given class type
 	 * when expanding.
@@ -104,10 +104,10 @@ public class MiscUtil {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	/**
 	 * Searches object in array.
-	 * 
+	 *
 	 * @return first index of match, or -1 when not found
 	 */
 	public static <T> int indexOf(T[] array, T obj) {
@@ -116,8 +116,8 @@ public class MiscUtil {
 		}
 		return -1;
 	}
-	
-	public static float GEN_clamped(float a, float lb, float ub) {
+
+	public static double GEN_clamped(double a, double lb, double ub) {
 		return a < lb ? lb : (ub < a ? ub : a);
 	}
 
@@ -148,7 +148,7 @@ public class MiscUtil {
 
 	/**
 	 * Sorts list using heap sort.<p>
-	 * 
+	 *
 	 * Implementation from: http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Sort/Heap/
 	 */
 	public static <T> void heapSort(ObjectArrayList<T> list, Comparator<T> comparator) {
@@ -174,7 +174,7 @@ public class MiscUtil {
 		list.setQuick(index0, list.getQuick(index1));
 		list.setQuick(index1, temp);
 	}
-	
+
 	/**
 	 * Sorts list using quick sort.<p>
 	 */
@@ -195,7 +195,7 @@ public class MiscUtil {
 		do {
 			while (comparator.compare(list.getQuick(i), x) < 0) i++;
 			while (comparator.compare(x, list.getQuick(j)) < 0) j--;
-			
+
 			if (i <= j) {
 				swap(list, i, j);
 				i++;

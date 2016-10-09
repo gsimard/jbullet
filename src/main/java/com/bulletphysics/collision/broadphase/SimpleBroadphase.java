@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -24,13 +24,13 @@
 package com.bulletphysics.collision.broadphase;
 
 import com.bulletphysics.util.ObjectArrayList;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * SimpleBroadphase is just a unit-test for {@link AxisSweep3}, {@link AxisSweep3_32},
  * or {@link DbvtBroadphase}, so use those classes instead. It is a brute force AABB
  * culling broadphase based on O(n^2) AABB checks.
- * 
+ *
  * @author jezek2
  */
 public class SimpleBroadphase extends BroadphaseInterface {
@@ -47,7 +47,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 	public SimpleBroadphase(int maxProxies) {
 		this(maxProxies, null);
 	}
-	
+
 	public SimpleBroadphase(int maxProxies, OverlappingPairCache overlappingPairCache) {
 		this.pairCache = overlappingPairCache;
 
@@ -57,7 +57,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		}
 	}
 
-	public BroadphaseProxy createProxy(Vector3f aabbMin, Vector3f aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
+	public BroadphaseProxy createProxy(Vector3d aabbMin, Vector3d aabbMax, BroadphaseNativeType shapeType, Object userPtr, short collisionFilterGroup, short collisionFilterMask, Dispatcher dispatcher, Object multiSapProxy) {
 		assert (aabbMin.x <= aabbMax.x && aabbMin.y <= aabbMax.y && aabbMin.z <= aabbMax.z);
 
 		SimpleBroadphaseProxy proxy = new SimpleBroadphaseProxy(aabbMin, aabbMax, shapeType, userPtr, collisionFilterGroup, collisionFilterMask, multiSapProxy);
@@ -72,7 +72,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		pairCache.removeOverlappingPairsContainingProxy(proxyOrg, dispatcher);
 	}
 
-	public void setAabb(BroadphaseProxy proxy, Vector3f aabbMin, Vector3f aabbMax, Dispatcher dispatcher) {
+	public void setAabb(BroadphaseProxy proxy, Vector3d aabbMin, Vector3d aabbMax, Dispatcher dispatcher) {
 		SimpleBroadphaseProxy sbp = (SimpleBroadphaseProxy)proxy;
 		sbp.min.set(aabbMin);
 		sbp.max.set(aabbMax);
@@ -90,7 +90,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 			for (int j=0; j<handles.size(); j++) {
 				SimpleBroadphaseProxy proxy1 = handles.getQuick(j);
 				if (proxy0 == proxy1) continue;
-				
+
 				if (aabbOverlap(proxy0, proxy1)) {
 					if (pairCache.findPair(proxy0, proxy1) == null) {
 						pairCache.addOverlappingPair(proxy0, proxy1);
@@ -98,7 +98,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 				}
 				else {
 					// JAVA NOTE: pairCache.hasDeferredRemoval() = true is not implemented
-					
+
 					if (!pairCache.hasDeferredRemoval()) {
 						if (pairCache.findPair(proxy0, proxy1) != null) {
 							pairCache.removeOverlappingPair(proxy0, proxy1, dispatcher);
@@ -113,7 +113,7 @@ public class SimpleBroadphase extends BroadphaseInterface {
 		return pairCache;
 	}
 
-	public void getBroadphaseAabb(Vector3f aabbMin, Vector3f aabbMax) {
+	public void getBroadphaseAabb(Vector3d aabbMin, Vector3d aabbMax) {
 		aabbMin.set(-1e30f, -1e30f, -1e30f);
 		aabbMax.set(1e30f, 1e30f, 1e30f);
 	}
@@ -122,5 +122,5 @@ public class SimpleBroadphase extends BroadphaseInterface {
 //		System.out.printf("btSimpleBroadphase.h\n");
 //		System.out.printf("numHandles = %d, maxHandles = %d\n", /*numHandles*/ handles.size(), maxHandles);
 	}
-	
+
 }

@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -24,64 +24,64 @@
 package com.bulletphysics.collision.shapes;
 
 import com.bulletphysics.collision.broadphase.BroadphaseNativeType;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * BU_Simplex1to4 implements feature based and implicit simplex of up to 4 vertices
  * (tetrahedron, triangle, line, vertex).
- * 
+ *
  * @author jezek2
  */
 public class BU_Simplex1to4 extends PolyhedralConvexShape {
 
 	protected int numVertices = 0;
-	protected Vector3f[] vertices = new Vector3f[4];
+	protected Vector3d[] vertices = new Vector3d[4];
 
 	public BU_Simplex1to4() {
 	}
 
-	public BU_Simplex1to4(Vector3f pt0) {
+	public BU_Simplex1to4(Vector3d pt0) {
 		addVertex(pt0);
 	}
 
-	public BU_Simplex1to4(Vector3f pt0, Vector3f pt1) {
+	public BU_Simplex1to4(Vector3d pt0, Vector3d pt1) {
 		addVertex(pt0);
 		addVertex(pt1);
 	}
 
-	public BU_Simplex1to4(Vector3f pt0, Vector3f pt1, Vector3f pt2) {
+	public BU_Simplex1to4(Vector3d pt0, Vector3d pt1, Vector3d pt2) {
 		addVertex(pt0);
 		addVertex(pt1);
 		addVertex(pt2);
 	}
 
-	public BU_Simplex1to4(Vector3f pt0, Vector3f pt1, Vector3f pt2, Vector3f pt3) {
+	public BU_Simplex1to4(Vector3d pt0, Vector3d pt1, Vector3d pt2, Vector3d pt3) {
 		addVertex(pt0);
 		addVertex(pt1);
 		addVertex(pt2);
 		addVertex(pt3);
 	}
-	
+
 	public void reset() {
 		numVertices = 0;
 	}
-	
+
 	@Override
 	public BroadphaseNativeType getShapeType() {
 		return BroadphaseNativeType.TETRAHEDRAL_SHAPE_PROXYTYPE;
 	}
-	
-	public void addVertex(Vector3f pt) {
+
+	public void addVertex(Vector3d pt) {
 		if (vertices[numVertices] == null) {
-			vertices[numVertices] = new Vector3f();
+			vertices[numVertices] = new Vector3d();
 		}
-		
+
 		vertices[numVertices++] = pt;
 
 		recalcLocalAabb();
 	}
 
-	
+
 	@Override
 	public int getNumVertices() {
 		return numVertices;
@@ -103,7 +103,7 @@ public class BU_Simplex1to4 extends PolyhedralConvexShape {
 	}
 
 	@Override
-	public void getEdge(int i, Vector3f pa, Vector3f pb) {
+	public void getEdge(int i, Vector3d pa, Vector3d pb) {
 		switch (numVertices) {
 			case 2:
 				pa.set(vertices[0]);
@@ -156,7 +156,7 @@ public class BU_Simplex1to4 extends PolyhedralConvexShape {
 	}
 
 	@Override
-	public void getVertex(int i, Vector3f vtx) {
+	public void getVertex(int i, Vector3d vtx) {
 		vtx.set(vertices[i]);
 	}
 
@@ -173,15 +173,15 @@ public class BU_Simplex1to4 extends PolyhedralConvexShape {
 	}
 
 	@Override
-	public void getPlane(Vector3f planeNormal, Vector3f planeSupport, int i) {
+	public void getPlane(Vector3d planeNormal, Vector3d planeSupport, int i) {
 	}
-	
+
 	public int getIndex(int i) {
 		return 0;
 	}
 
 	@Override
-	public boolean isInside(Vector3f pt, float tolerance) {
+	public boolean isInside(Vector3d pt, double tolerance) {
 		return false;
 	}
 

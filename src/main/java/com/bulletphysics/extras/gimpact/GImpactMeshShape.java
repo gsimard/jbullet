@@ -11,11 +11,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -35,20 +35,20 @@ import com.bulletphysics.extras.gimpact.BoxCollision.AABB;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import cz.advel.stack.Stack;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  *
  * @author jezek2
  */
 public class GImpactMeshShape extends GImpactShapeInterface {
-	
+
 	protected ObjectArrayList<GImpactMeshShapePart> mesh_parts = new ObjectArrayList<GImpactMeshShapePart>();
 
 	public GImpactMeshShape(StridingMeshInterface meshInterface) {
 		buildMeshParts(meshInterface);
 	}
-	
+
 	public int getMeshPartCount() {
 		return mesh_parts.size();
 	}
@@ -58,7 +58,7 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	}
 
 	@Override
-	public void setLocalScaling(Vector3f scaling) {
+	public void setLocalScaling(Vector3d scaling) {
 		localScaling.set(scaling);
 
 		int i = mesh_parts.size();
@@ -71,7 +71,7 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	}
 
 	@Override
-	public void setMargin(float margin) {
+	public void setMargin(double margin) {
 		collisionMargin = margin;
 
 		int i = mesh_parts.size();
@@ -95,14 +95,14 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	}
 
 	@Override
-	public void calculateLocalInertia(float mass, Vector3f inertia) {
+	public void calculateLocalInertia(double mass, Vector3d inertia) {
 		//#ifdef CALC_EXACT_INERTIA
 		inertia.set(0f, 0f, 0f);
 
 		int i = getMeshPartCount();
-		float partmass = mass / (float) i;
+		double partmass = mass / (double) i;
 
-		Vector3f partinertia = Stack.alloc(Vector3f.class);
+		Vector3d partinertia = Stack.alloc(Vector3d.class);
 
 		while ((i--) != 0) {
 			getMeshPart(i).calculateLocalInertia(partmass, partinertia);
@@ -124,7 +124,7 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 		//inertia = scaledmass * (btVector3(y2+z2,x2+z2,x2+y2));
 		////#endif
 	}
-	
+
 	@Override
 	PrimitiveManagerBase getPrimitiveManager() {
 		assert (false);
@@ -176,7 +176,7 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	}
 
 	@Override
-	public void getChildAabb(int child_index, Transform t, Vector3f aabbMin, Vector3f aabbMax) {
+	public void getChildAabb(int child_index, Transform t, Vector3d aabbMin, Vector3d aabbMax) {
 		assert (false);
 	}
 
@@ -208,17 +208,17 @@ public class GImpactMeshShape extends GImpactShapeInterface {
 	}
 
 	@Override
-	public void rayTest(Vector3f rayFrom, Vector3f rayTo, RayResultCallback resultCallback) {
+	public void rayTest(Vector3d rayFrom, Vector3d rayTo, RayResultCallback resultCallback) {
 	}
 
 	@Override
-	public void processAllTriangles(TriangleCallback callback, Vector3f aabbMin, Vector3f aabbMax) {
+	public void processAllTriangles(TriangleCallback callback, Vector3d aabbMin, Vector3d aabbMax) {
 		int i = mesh_parts.size();
 		while ((i--) != 0) {
 			mesh_parts.getQuick(i).processAllTriangles(callback, aabbMin, aabbMax);
 		}
 	}
-	
+
 	protected void buildMeshParts(StridingMeshInterface meshInterface) {
 		for (int i=0; i<meshInterface.getNumSubParts(); i++) {
 			GImpactMeshShapePart newpart = new GImpactMeshShapePart(meshInterface, i);

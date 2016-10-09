@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -26,61 +26,61 @@ package com.bulletphysics.linearmath;
 import com.bulletphysics.collision.shapes.UniformScalingShape;
 import cz.advel.stack.Stack;
 import cz.advel.stack.StaticAlloc;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Matrix4d;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Vector3d;
 
 /**
  * Transform represents translation and rotation (rigid transform). Scaling and
  * shearing is not supported.<p>
- * 
+ *
  * You can use local shape scaling or {@link UniformScalingShape} for static rescaling
  * of collision objects.
- * 
+ *
  * @author jezek2
  */
 public class Transform {
-	
+
 	//protected BulletStack stack;
 
 	/** Rotation matrix of this Transform. */
-	public final Matrix3f basis = new Matrix3f();
-	
+	public final Matrix3d basis = new Matrix3d();
+
 	/** Translation vector of this Transform. */
-	public final Vector3f origin = new Vector3f();
+	public final Vector3d origin = new Vector3d();
 
 	public Transform() {
 	}
 
-	public Transform(Matrix3f mat) {
+	public Transform(Matrix3d mat) {
 		basis.set(mat);
 	}
 
-	public Transform(Matrix4f mat) {
+	public Transform(Matrix4d mat) {
 		set(mat);
 	}
 
 	public Transform(Transform tr) {
 		set(tr);
 	}
-	
+
 	public void set(Transform tr) {
 		basis.set(tr.basis);
 		origin.set(tr.origin);
 	}
-	
-	public void set(Matrix3f mat) {
+
+	public void set(Matrix3d mat) {
 		basis.set(mat);
 		origin.set(0f, 0f, 0f);
 	}
 
-	public void set(Matrix4f mat) {
+	public void set(Matrix4d mat) {
 		mat.getRotationScale(basis);
 		origin.set(mat.m03, mat.m13, mat.m23);
 	}
-	
-	public void transform(Vector3f v) {
+
+	public void transform(Vector3d v) {
 		basis.transform(v);
 		v.add(origin);
 	}
@@ -89,7 +89,7 @@ public class Transform {
 		basis.setIdentity();
 		origin.set(0f, 0f, 0f);
 	}
-	
+
 	public void inverse() {
 		basis.transpose();
 		origin.scale(-1f);
@@ -100,9 +100,9 @@ public class Transform {
 		set(tr);
 		inverse();
 	}
-	
+
 	public void mul(Transform tr) {
-		Vector3f vec = Stack.alloc(tr.origin);
+		Vector3d vec = Stack.alloc(tr.origin);
 		transform(vec);
 
 		basis.mul(tr.basis);
@@ -111,36 +111,36 @@ public class Transform {
 
 	@StaticAlloc
 	public void mul(Transform tr1, Transform tr2) {
-		Vector3f vec = Stack.alloc(tr2.origin);
+		Vector3d vec = Stack.alloc(tr2.origin);
 		tr1.transform(vec);
 
 		basis.mul(tr1.basis, tr2.basis);
 		origin.set(vec);
 	}
-	
-	public void invXform(Vector3f inVec, Vector3f out) {
+
+	public void invXform(Vector3d inVec, Vector3d out) {
 		out.sub(inVec, origin);
 
-		Matrix3f mat = Stack.alloc(basis);
+		Matrix3d mat = Stack.alloc(basis);
 		mat.transpose();
 		mat.transform(out);
 	}
-	
-	public Quat4f getRotation(Quat4f out) {
+
+	public Quat4d getRotation(Quat4d out) {
 		MatrixUtil.getRotation(basis, out);
 		return out;
 	}
-	
-	public void setRotation(Quat4f q) {
+
+	public void setRotation(Quat4d q) {
 		MatrixUtil.setRotation(basis, q);
 	}
-	
-	public void setFromOpenGLMatrix(float[] m) {
+
+	public void setFromOpenGLMatrix(double[] m) {
 		MatrixUtil.setFromOpenGLSubMatrix(basis, m);
 		origin.set(m[12], m[13], m[14]);
 	}
 
-	public void getOpenGLMatrix(float[] m) {
+	public void getOpenGLMatrix(double[] m) {
 		MatrixUtil.getOpenGLSubMatrix(basis, m);
 		m[12] = origin.x;
 		m[13] = origin.y;
@@ -148,7 +148,7 @@ public class Transform {
 		m[15] = 1f;
 	}
 
-	public Matrix4f getMatrix(Matrix4f out) {
+	public Matrix4d getMatrix(Matrix4d out) {
 		out.set(basis);
 		out.m03 = origin.x;
 		out.m13 = origin.y;
@@ -170,5 +170,5 @@ public class Transform {
 		hash = 41 * hash + origin.hashCode();
 		return hash;
 	}
-	
+
 }
