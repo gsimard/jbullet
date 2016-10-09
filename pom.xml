@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cz.advel.jbullet</groupId>
     <artifactId>jbullet</artifactId>
-    <version>20101010-2-SNAPSHOT</version>
+    <version>20161008</version>
     <packaging>jar</packaging>
     <name>jbullet</name>
-    <description>JBullet - Java port of Bullet Physics Library</description>
+    <description>JBullet - Java port of Bullet Physics Library - Double Precision - Java8 compatible JStackAlloc</description>
     <url>http://jbullet.advel.cz/</url>
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -24,9 +24,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:jbullet-maven/jbullet.git</connection>
-        <developerConnection>scm:git:git@github.com:jbullet-maven/jbullet.git</developerConnection>
-        <url>git@github.com:jbullet-maven/jbullet.git</url>
+        <connection>scm:git:git@github.com:gsimard/jbullet.git</connection>
+        <developerConnection>scm:git:git@github.com:gsimard/jbullet.git</developerConnection>
+        <url>git@github.com:gsimard/jbullet.git</url>
     </scm>
     <developers>
         <developer>
@@ -43,6 +43,14 @@
             <email>iamtakingiteasy@eientei.org</email>
             <roles>
                 <role>Project mavenisation maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>gsimard</id>
+            <name>Guillaume Simard</name>
+            <email>gsimard@gmail.com</email>
+            <roles>
+                <role>Fork maintainer</role>
             </roles>
         </developer>
     </developers>
